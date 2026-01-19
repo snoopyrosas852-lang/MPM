@@ -36,7 +36,7 @@ interface SortConfig {
 const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConfig, onOpenDetail }) => {
   const [activeStatus, setActiveStatus] = useState<MaterialStatus>(MaterialStatus.ALL);
   const [showFilterConfig, setShowFilterConfig] = useState(false);
-  const [isFilterExpanded, setIsFilterExpanded] = useState(true);
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false); // 默认收起
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
 
   const [colWidths, setColWidths] = useState<Record<string, number>>({
@@ -72,7 +72,6 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
     { key: 'auditTime', label: '审核时间', visible: true },
     { key: 'priceRange', label: '协议价范围', visible: true },
     { key: 'auditRemark', label: '审核备注', visible: true },
-    { key: 'submissionSource', label: '提报来源', visible: false },
     { key: 'flowCode', label: '审批流编码', visible: true },
   ]);
 
@@ -186,15 +185,19 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   const visibleFilters = filterOptions.filter(f => f.visible);
   
-  // Calculate filters to show based on expansion state
-  const displayedFilters = isFilterExpanded ? visibleFilters : visibleFilters.slice(0, 4);
+  // 判断某个筛选键是否应该显示 (逻辑：展开时显示所有可见，收起时仅显示前4个可见)
+  const isFilterShown = (key: string) => {
+    const visibleIndex = visibleFilters.findIndex(f => f.key === key);
+    if (visibleIndex === -1) return false;
+    return isFilterExpanded ? true : visibleIndex < 4;
+  };
 
   return (
     <div className="flex flex-col h-full bg-[#f4f7fc]">
-      {/* 增强型筛选面板 - 对应截图顶部搜索区域 */}
+      {/* 增强型筛选面板 */}
       <div className="bg-white m-4 mb-2 rounded-xl border border-slate-200 shadow-sm p-6 relative">
-        <div className={`grid grid-cols-4 gap-x-8 gap-y-6 items-end transition-all duration-300 overflow-hidden`}>
-          {displayedFilters.some(f => f.key === 'projectName') && (
+        <div className="grid grid-cols-4 gap-x-8 gap-y-6 items-end transition-all duration-300">
+          {isFilterShown('projectName') && (
             <SearchItem label="项目名称">
               <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all appearance-none cursor-pointer">
                 <option value="">请选择项目</option>
@@ -204,17 +207,17 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'code') && (
+          {isFilterShown('code') && (
             <SearchItem label="物料编码">
               <input type="text" placeholder="多个编码用逗号隔开" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'name') && (
+          {isFilterShown('name') && (
             <SearchItem label="商品名称">
               <input type="text" placeholder="请输入商品名称关键词" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'submissionType') && (
+          {isFilterShown('submissionType') && (
             <SearchItem label="提报类型">
               <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all appearance-none cursor-pointer">
                 <option value="">全部类型</option>
@@ -223,41 +226,37 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
             </SearchItem>
           )}
-          
-          {/* Second Row Items */}
-          {displayedFilters.some(f => f.key === 'supplier') && (
+          {isFilterShown('supplier') && (
             <SearchItem label="提报供应商">
               <input type="text" placeholder="请输入供应商名称" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'auditor') && (
+          {isFilterShown('auditor') && (
             <SearchItem label="审核人">
               <input type="text" placeholder="请输入审核人姓名" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'submitTime') && (
+          {isFilterShown('submitTime') && (
             <SearchItem label="提报时间">
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 group-focus-within:border-blue-500 group-focus-within:bg-white transition-all">
                 <Calendar size={14} className="text-slate-400" />
-                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+                <input type="date" className="flex-1 bg-transparent py-2 text-[10px] font-bold text-slate-700 outline-none" />
                 <span className="text-slate-300 text-[10px]">至</span>
-                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+                <input type="date" className="flex-1 bg-transparent py-2 text-[10px] font-bold text-slate-700 outline-none" />
               </div>
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'auditTime') && (
+          {isFilterShown('auditTime') && (
             <SearchItem label="审核时间">
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 group-focus-within:border-blue-500 group-focus-within:bg-white transition-all">
                 <Calendar size={14} className="text-slate-400" />
-                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+                <input type="date" className="flex-1 bg-transparent py-2 text-[10px] font-bold text-slate-700 outline-none" />
                 <span className="text-slate-300 text-[10px]">至</span>
-                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+                <input type="date" className="flex-1 bg-transparent py-2 text-[10px] font-bold text-slate-700 outline-none" />
               </div>
             </SearchItem>
           )}
-          
-          {/* Third Row Items */}
-          {displayedFilters.some(f => f.key === 'priceRange') && (
+          {isFilterShown('priceRange') && (
             <SearchItem label="协议价范围">
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 transition-all group-focus-within:border-blue-500 group-focus-within:bg-white">
                 <span className="text-slate-400 text-[10px]">¥</span>
@@ -267,12 +266,12 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
               </div>
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'auditRemark') && (
+          {isFilterShown('auditRemark') && (
             <SearchItem label="审核备注">
               <input type="text" placeholder="请输入备注内容" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {displayedFilters.some(f => f.key === 'flowCode') && (
+          {isFilterShown('flowCode') && (
             <SearchItem label="审批流编码">
               <input type="text" placeholder="请输入编码" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
@@ -281,21 +280,17 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
         <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
           <div className="flex gap-2 relative" ref={configRef}>
-            {/* 收起/展开筛选按钮 */}
+            {/* 收起/展开筛选按钮 - 根据截图新增 */}
             {visibleFilters.length > 4 && (
               <button 
                 onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-black text-blue-600 hover:bg-blue-50 active:scale-95 transition-all shadow-sm border-dashed"
+                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#2e5ef0] rounded-lg text-xs font-black text-[#2e5ef0] hover:bg-blue-50 transition-all active:scale-95 shadow-sm"
               >
-                {isFilterExpanded ? (
-                  <>收起筛选 <ChevronUp size={16} /></>
-                ) : (
-                  <>展开筛选 <ChevronDown size={16} /></>
-                )}
+                {isFilterExpanded ? '收起筛选' : '展开筛选'}
+                {isFilterExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </button>
             )}
 
-            {/* 对应截图中带虚线的配置按钮 */}
             <button 
               onClick={() => setShowFilterConfig(!showFilterConfig)}
               className={`group flex items-center gap-2 px-5 py-2.5 border rounded-lg text-xs font-black transition-all shadow-sm active:scale-95 ${showFilterConfig ? 'bg-blue-50 border-blue-500 text-blue-600 border-dashed ring-2 ring-blue-500/10' : 'bg-white border-slate-200 text-slate-600 border-dashed hover:border-blue-400 hover:text-blue-500'}`}
@@ -310,7 +305,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
               <Search size={16} /> 查询
             </button>
 
-            {/* 优化后的配置下拉菜单 */}
+            {/* 配置下拉菜单 */}
             {showFilterConfig && (
               <div className="absolute right-0 top-full mt-4 w-[400px] bg-white border border-slate-200 shadow-2xl rounded-2xl z-[100] animate-in fade-in zoom-in-95 duration-200 overflow-hidden ring-1 ring-black/10">
                 <div className="p-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
@@ -360,7 +355,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
         </div>
       </div>
 
-      {/* 状态切换栏 - 对应截图下方状态Tab */}
+      {/* 状态切换栏 */}
       <div className="mx-4 mb-4 flex gap-1 items-center bg-slate-200/50 p-1.5 rounded-xl w-fit shadow-inner mt-2">
         {Object.values(MaterialStatus).map((s) => (
           <button
@@ -511,7 +506,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
           </table>
         </div>
         
-        {/* 现代分页栏 */}
+        {/* 分页栏 */}
         <div className="px-8 py-4 bg-white border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
