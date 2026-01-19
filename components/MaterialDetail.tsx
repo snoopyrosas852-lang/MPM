@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { 
   ArrowLeft, FileText, CheckCircle, XCircle, History, RefreshCw, 
-  ImageIcon, Info, Box, ClipboardList, Tag, FileCheck
+  Image as ImageIcon, Info, Box, ClipboardList, Tag, FileCheck
 } from 'lucide-react';
 import { Material, MaterialStatus } from '../types';
 
@@ -16,13 +16,13 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
 
   const getStatusStyle = (s: MaterialStatus) => {
     switch (s) {
-      case MaterialStatus.PENDING_AUDIT: return 'bg-blue-50 text-blue-600 border-blue-200';
-      case MaterialStatus.APPROVED: return 'bg-emerald-50 text-emerald-600 border-emerald-200';
-      case MaterialStatus.REJECTED: return 'bg-red-50 text-red-500 border-red-200';
-      case MaterialStatus.PUSH_FAILED: return 'bg-orange-50 text-orange-500 border-orange-200';
-      case MaterialStatus.PENDING_SALES_AUDIT: return 'bg-purple-50 text-purple-600 border-purple-200';
-      case MaterialStatus.SALES_AUDITING: return 'bg-indigo-50 text-indigo-600 border-indigo-200';
-      default: return 'bg-slate-50 text-slate-500 border-slate-200';
+      case MaterialStatus.PENDING_AUDIT: return 'bg-blue-50 text-blue-500 border-blue-100';
+      case MaterialStatus.APPROVED: return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case MaterialStatus.REJECTED: return 'bg-red-50 text-red-400 border-red-100';
+      case MaterialStatus.PUSH_FAILED: return 'bg-orange-50 text-orange-400 border-orange-100';
+      case MaterialStatus.PENDING_SALES_AUDIT: return 'bg-purple-50 text-purple-600 border-purple-100';
+      case MaterialStatus.SALES_AUDITING: return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+      default: return 'bg-slate-50 text-slate-500 border-slate-100';
     }
   };
 
@@ -54,19 +54,19 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
       {/* 核心信息区与操作栏 */}
       <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
         <div className="flex justify-end gap-3 pb-6 border-b border-slate-100 mb-6">
-          <button className="px-5 py-2 bg-emerald-600 text-white rounded-md text-[11px] font-black shadow-md hover:bg-emerald-700 flex items-center gap-1.5 transition-all">
-            <CheckCircle size={14} /> 同意
+          <button className="px-4 py-1.5 bg-[#2e5ef0] text-white rounded text-[11px] font-black shadow hover:bg-blue-700 flex items-center gap-1.5 transition-all">
+            <CheckCircle size={14} /> 通过
           </button>
-          <button className="px-5 py-2 bg-red-500 text-white rounded-md text-[11px] font-black shadow-md hover:bg-red-600 flex items-center gap-1.5 transition-all">
-            <XCircle size={14} /> 驳回
+          <button className="px-4 py-1.5 text-[#2e5ef0] hover:bg-blue-50 rounded text-[11px] font-black transition-colors">
+            驳回
           </button>
-          <button className="px-4 py-2 text-[#2e5ef0] hover:bg-blue-50 rounded-md text-[11px] font-black transition-colors border border-blue-100">
+          <button className="px-4 py-1.5 text-[#2e5ef0] hover:bg-blue-50 rounded text-[11px] font-black transition-colors">
             流程记录
           </button>
-          <button className="px-5 py-2 bg-[#2e5ef0] text-white rounded-md text-[11px] font-black shadow-md hover:bg-blue-700 flex items-center gap-1.5 transition-all">
+          <button className="px-4 py-1.5 bg-[#2e5ef0] text-white rounded text-[11px] font-black shadow hover:bg-blue-700 flex items-center gap-1.5 transition-all">
             <RefreshCw size={14} /> 重新推送
           </button>
-          <button onClick={onBack} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-md text-[11px] font-black transition-colors flex items-center gap-1.5 border border-slate-200">
+          <button onClick={onBack} className="px-4 py-1.5 text-[#2e5ef0] hover:bg-blue-50 rounded text-[11px] font-black transition-colors flex items-center gap-1.5">
             <ArrowLeft size={14} /> 返回列表
           </button>
         </div>
@@ -75,7 +75,7 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
           <InfoItem label="流程编码" value={`RP${material.flowCode}0001`} />
           <InfoItem label="项目名称" value={material.projectName} />
           <InfoItem label="当前状态" value={
-            <span className={`inline-block px-3 py-0.5 rounded-full text-[10px] font-black border whitespace-nowrap shadow-sm ${getStatusStyle(material.status)}`}>
+            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black border whitespace-nowrap ${getStatusStyle(material.status)}`}>
               {getStatusLabel(material.status)}
             </span>
           } />
@@ -83,22 +83,23 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
           
           <InfoItem label="商品编码" value={material.code} isMono />
           
+          {/* 合并显示的商品名称项 */}
           <div className="space-y-1.5 col-span-1">
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
               商品名称
             </div>
-            <div className="p-2 border-2 border-dashed border-blue-100 rounded-md bg-blue-50/10">
+            <div className="p-2 border-2 border-dashed border-blue-200 rounded-md bg-blue-50/20">
               <div className="text-[12px] font-black text-slate-900 leading-snug">
                 <span className="text-blue-700 mr-1">[{material.brand}]</span> 
                 {material.name} {material.spec} <span className="text-slate-400 font-bold ml-1">({material.unit})</span>
               </div>
-              <div className="text-[10px] text-slate-500 mt-1 truncate" title={material.description}>
+              <div className="text-[10px] text-slate-400 mt-1 truncate" title={material.description}>
                 描述：{material.description}
               </div>
             </div>
           </div>
 
-          <InfoItem label="协议价" value={<span className="text-red-600 font-black text-base">¥ {material.price.toFixed(2)}</span>} />
+          <InfoItem label="协议价" value={<span className="text-red-500 font-black text-sm">¥ {material.price.toFixed(2)}</span>} />
           <InfoItem label="提报供应商" value={material.supplier} />
         </div>
       </div>
@@ -120,8 +121,10 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
         </div>
       </div>
 
+      {/* 内部 Tab 滑块容器 */}
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col min-h-[400px]">
-        <div className="flex border-b border-slate-100 px-6 bg-slate-50/30">
+        {/* Tab 导航 */}
+        <div className="flex border-b border-slate-100 px-6">
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -137,18 +140,29 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
           ))}
         </div>
 
+        {/* Tab 内容区 */}
         <div className="p-8 flex-1">
           {activeTab === 'images-panel' && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="space-y-4">
                 <h6 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">主图</h6>
                 <div className="flex gap-4">
-                  <div className="w-28 h-28 bg-white rounded-lg border border-slate-200 p-2 group hover:border-blue-400 cursor-pointer overflow-hidden transition-all shadow-sm">
-                    <img src={material.imageUrl} alt="" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                  <div className="w-28 h-28 bg-slate-50 rounded-lg border border-slate-200 p-1 group hover:border-blue-400 cursor-pointer overflow-hidden transition-all shadow-sm">
+                    <img src={material.imageUrl} alt="" className="w-full h-full object-contain group-hover:scale-105 transition-transform" />
                   </div>
                   {[1, 2].map(i => (
-                    <div key={i} className="w-28 h-28 bg-slate-50 rounded-lg border border-dashed border-slate-300 p-2 group hover:border-blue-400 cursor-pointer overflow-hidden transition-all flex items-center justify-center">
+                    <div key={i} className="w-28 h-28 bg-slate-50 rounded-lg border border-slate-200 p-1 group hover:border-blue-400 cursor-pointer overflow-hidden transition-all shadow-sm flex items-center justify-center">
                        <ImageIcon size={24} className="text-slate-200" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h6 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">详情图</h6>
+                <div className="flex gap-4">
+                  {[1, 2].map(i => (
+                    <div key={i} className="w-28 h-28 bg-slate-50 rounded-lg border border-slate-200 p-1 hover:border-blue-400 cursor-pointer overflow-hidden transition-all shadow-sm flex items-center justify-center">
+                      <ImageIcon size={24} className="text-slate-200" />
                     </div>
                   ))}
                 </div>
@@ -181,7 +195,13 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
               <div className="space-y-2">
                 <label className="text-[11px] font-bold text-slate-400">项目标签</label>
                 <div className="flex gap-2">
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 shadow-sm">{material.projectName}</span>
+                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100">{material.projectName}</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-slate-400">品牌标签</label>
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-slate-50 text-slate-500 rounded-full text-[10px] font-black border border-slate-100">非代理品牌</span>
                 </div>
               </div>
             </div>
@@ -211,7 +231,7 @@ const FormField: React.FC<{ label: string; value: React.ReactNode; required?: bo
     <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
       {required && <span className="text-red-500">*</span>} {label}
     </div>
-    <div className="bg-[#f9fafb] border border-slate-200 rounded-md px-3 py-2 text-[11px] font-bold text-slate-700 min-h-[36px] flex items-center transition-colors hover:border-blue-200">
+    <div className="bg-[#f9fafb] border border-slate-100 rounded px-3 py-2 text-[11px] font-bold text-slate-700 min-h-[36px] flex items-center transition-colors hover:border-blue-100">
       {value}
     </div>
   </div>
