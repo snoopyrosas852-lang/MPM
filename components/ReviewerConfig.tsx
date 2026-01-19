@@ -148,21 +148,21 @@ const ReviewerConfig: React.FC = () => {
         <table className="w-full text-left">
           <thead>
             <tr className="bg-slate-50/20">
-              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">操作类型</th>
-              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">涉及人员</th>
-              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">操作详情</th>
-              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">时间</th>
-              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">操作人</th>
+              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">操作类型</th>
+              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">涉及人员</th>
+              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">操作详情</th>
+              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">时间</th>
+              <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">操作人</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {MOCK_AUDIT_LOGS.map(log => (
               <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">
                 <td className="p-4 text-[11px] font-bold text-slate-700">{log.type}</td>
-                <td className="p-4 text-[11px] text-blue-600 font-bold">{log.person}</td>
+                <td className="p-4 text-[11px] text-blue-600 font-bold text-center">{log.person}</td>
                 <td className="p-4 text-[11px] text-slate-500">{log.detail}</td>
-                <td className="p-4 text-[11px] font-mono text-slate-400">{log.time}</td>
-                <td className="p-4 text-[11px] text-right font-bold text-slate-600">{log.operator}</td>
+                <td className="p-4 text-[11px] font-mono text-slate-400 text-center">{log.time}</td>
+                <td className="p-4 text-[11px] font-bold text-slate-600 text-center">{log.operator}</td>
               </tr>
             ))}
           </tbody>

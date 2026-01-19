@@ -10,11 +10,16 @@ export enum MaterialStatus {
   SALES_AUDITING = 'SALES_AUDITING'
 }
 
+export enum SubmissionSource {
+  SCP = 'SCP',
+  COMMODITY_DEPT = '商品管理部'
+}
+
 export enum SubmissionType {
-  NEW = '新品提报',
-  UPDATE = '资料修改',
-  PRICE_CHANGE = '价格变动',
-  STOP_PRODUCTION = '停产申请'
+  NEW = '商品新增',
+  UPDATE = '商品修改',
+  PRICE_CHANGE = '价格更新',
+  RE_PUSH = '商品重推'
 }
 
 export interface Material {
@@ -28,6 +33,7 @@ export interface Material {
   unit: string;
   price: number;
   flowCode: string;
+  submissionSource: SubmissionSource;
   supplier: string;
   submitTime: string;
   status: MaterialStatus;

@@ -69,14 +69,14 @@ const ProjectConfig: React.FC = () => {
           <table className="w-full text-left border-collapse min-w-[1200px]">
             <thead>
               <tr className="bg-slate-50/30">
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">字段Key</th>
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">字段名称</th>
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">描述</th>
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">类型</th>
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">必填</th>
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">展示范围</th>
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">关联字段</th>
-                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">操作</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">字段Key</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">字段名称</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">描述</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">类型</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">必填</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">展示范围</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">关联字段</th>
+                <th className="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -85,20 +85,22 @@ const ProjectConfig: React.FC = () => {
                   <td className="p-4 text-xs font-mono text-blue-600 font-bold">{field.key}</td>
                   <td className="p-4 text-xs font-bold text-slate-800">{field.name}</td>
                   <td className="p-4 text-xs text-slate-500">{field.description}</td>
-                  <td className="p-4">
+                  <td className="p-4 text-center">
                     <span className="px-2 py-0.5 bg-slate-100 text-[10px] font-bold text-slate-600 rounded">
                       {field.controlType}
                     </span>
                   </td>
-                  <td className="p-4">
-                    {field.required ? (
-                      <CheckCircle2 className="text-green-500" size={16} />
-                    ) : (
-                      <AlertCircle className="text-slate-300" size={16} />
-                    )}
+                  <td className="p-4 text-center">
+                    <div className="flex justify-center">
+                      {field.required ? (
+                        <CheckCircle2 className="text-green-500" size={16} />
+                      ) : (
+                        <AlertCircle className="text-slate-300" size={16} />
+                      )}
+                    </div>
                   </td>
                   <td className="p-4">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 justify-center">
                       {field.scope.map(s => (
                         <span key={s} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-bold border border-blue-100">
                           {s}
@@ -106,9 +108,9 @@ const ProjectConfig: React.FC = () => {
                       ))}
                     </div>
                   </td>
-                  <td className="p-4 text-xs text-slate-400">{field.relatedField}</td>
-                  <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="p-4 text-xs text-slate-400 text-center">{field.relatedField}</td>
+                  <td className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2">
                       <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
                         <Edit2 size={14} />
                       </button>
