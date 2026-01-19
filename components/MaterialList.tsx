@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Search, RotateCcw, Settings2, Check, Layout, X, Info,
-  ArrowUpDown, ChevronUp, ChevronDown
+  ArrowUpDown, ChevronUp, ChevronDown, Filter, ChevronRight
 } from 'lucide-react';
 import { Material, MaterialStatus, SubmissionType, SubmissionSource } from '../types';
 
@@ -27,7 +27,6 @@ interface FilterOption {
   isPermanent?: boolean;
 }
 
-// 排序类型定义
 type SortDirection = 'asc' | 'desc' | null;
 interface SortConfig {
   key: keyof Material | '';
@@ -37,8 +36,6 @@ interface SortConfig {
 const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConfig, onOpenDetail }) => {
   const [activeStatus, setActiveStatus] = useState<MaterialStatus>(MaterialStatus.ALL);
   const [showFilterConfig, setShowFilterConfig] = useState(false);
-  
-  // 排序配置状态
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
 
   const [colWidths, setColWidths] = useState<Record<string, number>>({
@@ -51,12 +48,12 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
     productInfo: 300,
     code: 110,
     price: 90,
-    status: 90,
+    status: 100,
     auditor: 100,
-    submitTime: 150, // 略微加宽以容纳排序图标
-    auditTime: 150,  // 略微加宽以容纳排序图标
-    auditRemark: 180,
-    supplier: 150,
+    submitTime: 160,
+    auditTime: 160,
+    auditRemark: 200,
+    supplier: 180,
   });
 
   const resizingCol = useRef<string | null>(null);
@@ -119,7 +116,6 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
     e.preventDefault();
   };
 
-  // 处理排序切换逻辑
   const handleSort = (key: keyof Material) => {
     setSortConfig(prev => {
       if (prev.key === key) {
@@ -132,30 +128,18 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   const processedData = useMemo(() => {
     let data = [...MOCK_DATA];
-    
-    // 1. 状态筛选
     if (activeStatus !== MaterialStatus.ALL) {
       data = data.filter(item => item.status === activeStatus);
     }
-
-    // 2. 排序处理
     if (sortConfig.key && sortConfig.direction) {
       data.sort((a, b) => {
         const valA = a[sortConfig.key as keyof Material]?.toString() || '';
         const valB = b[sortConfig.key as keyof Material]?.toString() || '';
-
-        // 处理 '-' 或者空值，使其始终排在后面
         if (valA === '-' || valA === '') return 1;
         if (valB === '-' || valB === '') return -1;
-
-        if (sortConfig.direction === 'asc') {
-          return valA.localeCompare(valB);
-        } else {
-          return valB.localeCompare(valA);
-        }
+        return sortConfig.direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
     }
-
     return data;
   }, [activeStatus, sortConfig]);
 
@@ -176,12 +160,12 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   const getStatusStyle = (s: MaterialStatus) => {
     switch (s) {
-      case MaterialStatus.PENDING_AUDIT: return 'bg-blue-50 text-blue-600 border-blue-100';
-      case MaterialStatus.APPROVED: return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-      case MaterialStatus.REJECTED: return 'bg-red-50 text-red-500 border-red-100';
-      case MaterialStatus.PUSH_FAILED: return 'bg-orange-50 text-orange-500 border-orange-100';
-      case MaterialStatus.SALES_AUDITING: return 'bg-indigo-50 text-indigo-600 border-indigo-100';
-      default: return 'bg-slate-50 text-slate-500 border-slate-100';
+      case MaterialStatus.PENDING_AUDIT: return 'bg-blue-50 text-blue-600 border-blue-200';
+      case MaterialStatus.APPROVED: return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+      case MaterialStatus.REJECTED: return 'bg-red-50 text-red-500 border-red-200';
+      case MaterialStatus.PUSH_FAILED: return 'bg-orange-50 text-orange-600 border-orange-200';
+      case MaterialStatus.SALES_AUDITING: return 'bg-indigo-50 text-indigo-600 border-indigo-200';
+      default: return 'bg-slate-50 text-slate-500 border-slate-200';
     }
   };
 
@@ -203,12 +187,12 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   return (
     <div className="flex flex-col h-full bg-[#f4f7fc]">
-      {/* 筛选面板 */}
-      <div className="bg-white m-3 mb-2 rounded border border-slate-200 shadow-sm p-4 relative">
-        <div className="grid grid-cols-4 gap-x-6 gap-y-3 items-end">
+      {/* 增强型筛选面板 */}
+      <div className="bg-white m-4 mb-2 rounded-xl border border-slate-200 shadow-sm p-5 relative">
+        <div className="grid grid-cols-4 gap-x-8 gap-y-4 items-end">
           {filterOptions.find(f => f.key === 'projectName' && f.visible) && (
             <SearchItem label="项目名称">
-              <select className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 text-slate-500 font-medium">
+              <select className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all">
                 <option value="">请选择项目</option>
                 <option>管网新系统</option>
                 <option>国网商城</option>
@@ -217,17 +201,17 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
           )}
           {filterOptions.find(f => f.key === 'code' && f.visible) && (
             <SearchItem label="物料编码">
-              <input type="text" placeholder="多个物料编码用逗号隔开" className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-medium" />
+              <input type="text" placeholder="多个编码用逗号隔开" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
           {filterOptions.find(f => f.key === 'name' && f.visible) && (
             <SearchItem label="商品名称">
-              <input type="text" placeholder="请输入商品名称关键词" className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-medium" />
+              <input type="text" placeholder="请输入商品名称关键词" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
           {filterOptions.find(f => f.key === 'submissionType' && f.visible) && (
             <SearchItem label="提报类型">
-              <select className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-medium">
+              <select className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all">
                 <option value="">全部类型</option>
                 {Object.values(SubmissionType).map(t => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -235,76 +219,78 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
           )}
           {filterOptions.find(f => f.key === 'supplier' && f.visible) && (
             <SearchItem label="提报供应商">
-              <input type="text" placeholder="请输入供应商名称" className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-medium" />
+              <input type="text" placeholder="请输入供应商名称" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
           {filterOptions.find(f => f.key === 'auditor' && f.visible) && (
             <SearchItem label="审核人">
-              <input type="text" placeholder="请输入审核人姓名" className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-medium" />
+              <input type="text" placeholder="请输入审核人姓名" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
           {filterOptions.find(f => f.key === 'submitTime' && f.visible) && (
             <SearchItem label="提报时间">
-              <input type="date" className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 text-slate-500 font-medium" />
+              <input type="date" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all" />
             </SearchItem>
           )}
           {filterOptions.find(f => f.key === 'auditTime' && f.visible) && (
             <SearchItem label="审核时间">
-              <input type="date" className="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500 text-slate-500 font-medium" />
+              <input type="date" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all" />
             </SearchItem>
           )}
         </div>
 
-        <div className="mt-4 flex items-center justify-end gap-2 relative border-t border-slate-50 pt-3">
+        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
           <div className="flex gap-2" ref={configRef}>
             <button 
               onClick={() => setShowFilterConfig(!showFilterConfig)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 rounded text-[11px] font-bold text-blue-600 hover:bg-blue-50 transition-all"
+              className="group flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95"
             >
-              <Settings2 size={14} />
+              <Settings2 size={15} className="group-hover:rotate-45 transition-transform duration-300" />
               配置筛项
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-600 hover:bg-slate-50">
-              <RotateCcw size={14} /> 重置
+            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:bg-slate-50 active:scale-95 transition-all">
+              <RotateCcw size={15} /> 重置
             </button>
-            <button className="flex items-center gap-1.5 px-6 py-1.5 bg-[#2e5ef0] text-white rounded text-[11px] font-bold shadow-md hover:bg-blue-700 transition-all">
-              <Search size={14} /> 查询
+            <button className="flex items-center gap-2 px-8 py-2 bg-[#2e5ef0] text-white rounded-lg text-xs font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-95">
+              <Search size={15} /> 查询
             </button>
 
             {showFilterConfig && (
-              <div className="absolute right-0 top-full mt-2 w-[320px] bg-white border border-slate-200 shadow-2xl rounded-xl z-[100] animate-in fade-in zoom-in-95 duration-200 overflow-hidden ring-4 ring-black/5">
-                <div className="p-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Layout size={15} className="text-blue-600" />
-                    <span className="text-[12px] font-black text-slate-700">配置表格显示字段</span>
+              <div className="absolute right-0 top-full mt-3 w-[340px] bg-white border border-slate-200 shadow-2xl rounded-2xl z-[100] animate-in fade-in zoom-in-95 duration-200 overflow-hidden ring-1 ring-black/5">
+                <div className="p-4 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Layout size={16} className="text-blue-600" />
+                    </div>
+                    <span className="text-sm font-black text-slate-800 tracking-tight">配置表格显示字段</span>
                   </div>
-                  <button onClick={() => setShowFilterConfig(false)} className="text-slate-400 hover:text-slate-600">
+                  <button onClick={() => setShowFilterConfig(false)} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors">
                     <X size={16} />
                   </button>
                 </div>
-                <div className="p-4 max-h-[360px] overflow-y-auto custom-scrollbar">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">可用显示列</span>
-                    <div className="flex gap-3">
-                      <button onClick={handleSelectAll} className="text-[10px] font-bold text-blue-600 hover:underline">全选</button>
-                      <button onClick={handleResetDefault} className="text-[10px] font-bold text-slate-500 hover:underline">恢复默认</button>
+                <div className="p-5 max-h-[400px] overflow-y-auto custom-scrollbar bg-white">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.1em]">可用展示列</span>
+                    <div className="flex gap-4">
+                      <button onClick={handleSelectAll} className="text-[11px] font-black text-blue-600 hover:underline">全选</button>
+                      <button onClick={handleResetDefault} className="text-[11px] font-black text-slate-500 hover:underline">重置默认</button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     {filterOptions.map(opt => (
-                      <label key={opt.key} className={`flex items-center gap-2.5 p-2 rounded-lg cursor-pointer border transition-all ${opt.visible ? 'bg-blue-50 border-blue-200' : 'border-transparent hover:bg-slate-50'}`}>
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${opt.visible ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'}`}>
-                          {opt.visible && <Check size={11} className="text-white" />}
+                      <label key={opt.key} className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer border transition-all ${opt.visible ? 'bg-blue-50/50 border-blue-200 ring-2 ring-blue-500/5' : 'border-slate-100 hover:border-slate-300'}`}>
+                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${opt.visible ? 'bg-blue-600 border-blue-600 shadow-sm' : 'bg-white border-slate-300'}`}>
+                          {opt.visible && <Check size={12} className="text-white" strokeWidth={3} />}
                           <input type="checkbox" className="hidden" checked={opt.visible} onChange={() => toggleFilterVisibility(opt.key)} />
                         </div>
-                        <span className={`text-[11px] font-bold ${opt.visible ? 'text-blue-700' : 'text-slate-600'}`}>{opt.label}</span>
+                        <span className={`text-xs font-bold ${opt.visible ? 'text-blue-700' : 'text-slate-600'}`}>{opt.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
                 <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[10px] font-black text-slate-400">已启用 {visibleFilters.length} 个列</span>
-                  <button onClick={() => setShowFilterConfig(false)} className="px-5 py-2 bg-[#2e5ef0] text-white rounded-lg text-[11px] font-bold shadow-lg hover:bg-blue-700">保存设置</button>
+                  <span className="text-[11px] font-black text-slate-500">已选 {visibleFilters.length} 个字段</span>
+                  <button onClick={() => setShowFilterConfig(false)} className="px-6 py-2 bg-[#2e5ef0] text-white rounded-xl text-xs font-black shadow-md hover:bg-blue-700 transition-all active:scale-95">保存设置</button>
                 </div>
               </div>
             )}
@@ -312,16 +298,16 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
         </div>
       </div>
 
-      {/* 状态滑块 */}
-      <div className="mx-3 mb-3 flex gap-1 items-center bg-slate-200/40 p-1 rounded-lg w-fit">
+      {/* 状态滑块 - 优化 */}
+      <div className="mx-4 mb-4 flex gap-1 items-center bg-slate-200/50 p-1.5 rounded-xl w-fit shadow-inner">
         {Object.values(MaterialStatus).map((s) => (
           <button
             key={s}
             onClick={() => setActiveStatus(s)}
-            className={`px-4 py-1.5 text-[11px] font-black transition-all rounded-md ${
+            className={`px-5 py-2 text-xs font-black transition-all rounded-lg ${
               activeStatus === s 
-                ? 'bg-[#2e5ef0] text-white shadow-sm' 
-                : 'text-slate-600 hover:bg-white/50'
+                ? 'bg-white text-blue-600 shadow-sm ring-1 ring-black/5' 
+                : 'text-slate-500 hover:text-slate-700 hover:bg-white/40'
             }`}
           >
             {getStatusLabel(s)}
@@ -329,23 +315,27 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
         ))}
       </div>
 
-      {/* 批量操作 */}
-      <div className="mx-3 mb-3 flex justify-between items-center">
+      {/* 批量操作 - 优化 */}
+      <div className="mx-4 mb-4 flex justify-between items-center">
         <div className="flex gap-2">
           {['批量重推', '批量审核', '提交销售审核', '导出物料', '导出明细'].map(btn => (
-            <button key={btn} className="px-3 py-1.5 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-700 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm">
+            <button key={btn} className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-700 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95">
               {btn}
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
-          <button onClick={onOpenReviewerConfig} className="px-4 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-[11px] font-bold shadow-sm hover:border-blue-500 hover:text-blue-600">商品审核人配置</button>
-          <button onClick={onOpenProjectConfig} className="px-4 py-1.5 bg-[#2e5ef0] text-white rounded-lg text-[11px] font-bold shadow-md hover:bg-blue-700">项目提报配置</button>
+        <div className="flex gap-3">
+          <button onClick={onOpenReviewerConfig} className="flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-black shadow-sm hover:border-blue-500 hover:text-blue-600 transition-all active:scale-95">
+             <Filter size={14} /> 商品审核人配置
+          </button>
+          <button onClick={onOpenProjectConfig} className="flex items-center gap-2 px-5 py-2 bg-[#2e5ef0] text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all active:scale-95">
+             项目提报配置 <ChevronRight size={14} />
+          </button>
         </div>
       </div>
 
-      {/* 数据表格 */}
-      <div className="mx-3 mb-3 flex-1 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col overflow-hidden">
+      {/* 数据表格 - 样式调整：取消 ID 的蓝色 */}
+      <div className="mx-4 mb-4 flex-1 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-auto custom-scrollbar">
           <table className="w-full border-collapse table-fixed select-none">
             <colgroup>
@@ -368,7 +358,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
             <thead className="sticky top-0 z-20">
               <tr className="bg-[#e7eefe]">
                 <th className="p-2 border-r border-b border-slate-200 text-center">
-                  <input type="checkbox" className="w-4 h-4 rounded border-slate-300" />
+                  <input type="checkbox" className="w-4 h-4 rounded-md border-slate-300 accent-blue-600" />
                 </th>
                 <HeaderCell label="操作" onResizeStart={(e) => onResizeStart(e, 'ops')} />
                 <HeaderCell label="审批流编码" onResizeStart={(e) => onResizeStart(e, 'flowId')} />
@@ -400,54 +390,56 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
               {processedData.map((row) => (
-                <tr key={row.id} className="hover:bg-blue-50/20 transition-colors group">
-                  <td className="p-3 text-center border-r border-slate-100">
-                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300" />
+                <tr key={row.id} className="hover:bg-blue-50/40 transition-colors group">
+                  <td className="p-3 text-center border-r border-slate-50">
+                    <input type="checkbox" className="w-4 h-4 rounded-md border-slate-300 accent-blue-600" />
                   </td>
-                  <td className="p-3 border-r border-slate-100 text-center">
-                    <div className="flex justify-center items-center gap-3">
+                  <td className="p-3 border-r border-slate-50 text-center">
+                    <div className="flex justify-center items-center gap-4">
                       {row.status === MaterialStatus.PENDING_AUDIT && (
                         <>
-                          <button className="text-[11px] font-black text-emerald-600 hover:text-emerald-700">同意</button>
-                          <button className="text-[11px] font-black text-red-500 hover:text-red-600">驳回</button>
+                          <button className="text-[11px] font-black text-emerald-600 hover:text-emerald-700 transition-colors">同意</button>
+                          <button className="text-[11px] font-black text-red-500 hover:text-red-600 transition-colors">驳回</button>
                         </>
                       )}
-                      <button onClick={() => onOpenDetail(row)} className="text-[11px] font-black text-[#2e5ef0] hover:underline">详情</button>
+                      <button onClick={() => onOpenDetail(row)} className="text-[11px] font-black text-[#2e5ef0] hover:underline transition-all">详情</button>
                     </div>
                   </td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-bold text-blue-600/80 truncate font-mono">{row.flowCode}</td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-black text-slate-700 text-center">{row.submissionSource}</td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-bold text-slate-800 truncate">{row.projectName}</td>
-                  <td className="p-3 border-r border-slate-100 text-center">
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] rounded font-black">{row.submissionType}</span>
+                  {/* 取消 ID 蓝：改为 slate-600 */}
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-600 truncate font-mono">{row.flowCode}</td>
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-black text-slate-700 text-center">{row.submissionSource}</td>
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-800 truncate">{row.projectName}</td>
+                  <td className="p-3 border-r border-slate-50 text-center">
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] rounded font-black whitespace-nowrap">{row.submissionType}</span>
                   </td>
-                  <td className="p-3 border-r border-slate-100">
-                    <div className="flex items-center gap-3">
-                      <div className="shrink-0 w-9 h-9 rounded-lg border border-slate-100 overflow-hidden bg-white shadow-sm">
-                        <img src={row.imageUrl} alt="" className="w-full h-full object-contain p-1" />
+                  <td className="p-3 border-r border-slate-50">
+                    <div className="flex items-center gap-4">
+                      <div className="shrink-0 w-11 h-11 rounded-xl border border-slate-100 overflow-hidden bg-white shadow-sm ring-4 ring-slate-50/50">
+                        <img src={row.imageUrl} alt="" className="w-full h-full object-contain p-1.5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[11px] font-black text-slate-900 truncate">
-                          <span className="text-blue-600 mr-1">[{row.brand}]</span> {row.name} {row.spec}
+                        <div className="text-[11px] font-black text-slate-900 truncate leading-tight">
+                          <span className="text-blue-600 mr-1.5">[{row.brand}]</span> {row.name} {row.spec}
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5 truncate flex items-center gap-1">
-                           <Info size={10} className="shrink-0" />
+                        <div className="text-[10px] text-slate-400 mt-1 truncate flex items-center gap-1.5">
+                           <Info size={11} className="shrink-0 text-slate-300" />
                            {row.description}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-bold text-blue-600 truncate font-mono">{row.code}</td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-black text-red-500">¥{row.price.toFixed(2)}</td>
-                  <td className="p-3 border-r border-slate-100 text-center">
-                    <span className={`inline-block px-3 py-0.5 rounded-full text-[10px] font-black border whitespace-nowrap ${getStatusStyle(row.status)}`}>
+                  {/* 取消 ID 蓝：改为 slate-700 */}
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-700 truncate font-mono">{row.code}</td>
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-black text-red-500 tabular-nums">¥{row.price.toFixed(2)}</td>
+                  <td className="p-3 border-r border-slate-50 text-center">
+                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black border-2 whitespace-nowrap shadow-sm ${getStatusStyle(row.status)}`}>
                       {getStatusLabel(row.status)}
                     </span>
                   </td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-bold text-slate-700 text-center">{row.auditor || '-'}</td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-bold text-slate-500 font-mono text-center">{row.submitTime}</td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-bold text-slate-500 font-mono text-center">{row.auditTime}</td>
-                  <td className="p-3 border-r border-slate-100 text-[11px] font-medium text-slate-500 truncate group-hover:whitespace-normal" title={row.auditRemark}>
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-800 text-center">{row.auditor || '-'}</td>
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-500 font-mono text-center">{row.submitTime}</td>
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-500 font-mono text-center">{row.auditTime}</td>
+                  <td className="p-3 border-r border-slate-50 text-[11px] font-medium text-slate-600 truncate leading-relaxed group-hover:whitespace-normal group-hover:bg-slate-50/80 transition-all duration-300" title={row.auditRemark}>
                     {row.auditRemark || '-'}
                   </td>
                   <td className="p-3 text-[11px] text-slate-800 font-bold truncate">{row.supplier}</td>
@@ -457,30 +449,35 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
           </table>
         </div>
         
-        {/* 分页栏 */}
-        <div className="px-6 py-3 bg-white border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-500">
-          <div className="flex items-center gap-4">
-            <span>共 <span className="text-blue-600">{processedData.length}</span> 条记录</span>
-            <span className="text-slate-300">|</span>
-            <div className="flex items-center gap-1">
+        {/* 现代分页栏 */}
+        <div className="px-8 py-4 bg-white border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">总计数据</span>
+              <span className="text-blue-600 text-sm font-black">{processedData.length}</span>
+              <span className="text-slate-400">条</span>
+            </div>
+            <div className="h-4 w-px bg-slate-200"></div>
+            <div className="flex items-center gap-2">
               每页显示
-              <select className="mx-1 bg-slate-50 border border-slate-200 rounded px-1 font-bold outline-none">
+              <select className="bg-slate-100 border-none rounded-lg px-2 py-1 text-slate-700 font-black outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all">
                 <option>20</option>
                 <option>50</option>
+                <option>100</option>
               </select>
-              条
+              条数据
             </div>
           </div>
-          <div className="flex gap-2 items-center">
-            <button className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-slate-400 hover:bg-slate-50 disabled:opacity-50">上一页</button>
-            <div className="flex items-center gap-1">
+          <div className="flex gap-3 items-center">
+            <button className="px-5 py-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-50 transition-all shadow-sm active:scale-95">上一页</button>
+            <div className="flex items-center gap-2">
               {[1].map(p => (
-                <button key={p} className={`w-8 h-8 flex items-center justify-center rounded-lg text-[11px] font-black shadow-sm ${p === 1 ? 'bg-[#2e5ef0] text-white' : 'bg-white text-slate-600 border border-slate-100'}`}>
+                <button key={p} className={`w-9 h-9 flex items-center justify-center rounded-xl text-[12px] font-black shadow-md transition-all ${p === 1 ? 'bg-[#2e5ef0] text-white shadow-blue-500/20 scale-105' : 'bg-white text-slate-600 border border-slate-100'}`}>
                   {p}
                 </button>
               ))}
             </div>
-            <button className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">下一页</button>
+            <button className="px-5 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm active:scale-95">下一页</button>
           </div>
         </div>
       </div>
@@ -497,25 +494,25 @@ const HeaderCell: React.FC<{
 }> = ({ label, onResizeStart, sortable, sortDirection, onSort }) => {
   return (
     <th 
-      className={`p-3 border-r border-b border-slate-200 text-[11px] font-black text-slate-700 relative group text-center transition-colors ${sortable ? 'cursor-pointer hover:bg-blue-100/50' : 'hover:bg-slate-50'}`}
+      className={`p-4 border-r border-b border-slate-200 text-[11px] font-black text-slate-600 relative group text-center transition-all ${sortable ? 'cursor-pointer hover:bg-blue-100/30' : 'hover:bg-slate-50/50'}`}
       onClick={sortable ? onSort : undefined}
     >
-      <div className="flex items-center justify-center gap-1.5">
-        <span className="truncate" title={label}>{label}</span>
+      <div className="flex items-center justify-center gap-2">
+        <span className="truncate tracking-wide" title={label}>{label}</span>
         {sortable && (
           <div className="flex flex-col shrink-0">
             {sortDirection === 'asc' ? (
-              <ChevronUp size={12} className="text-blue-600" strokeWidth={3} />
+              <ChevronUp size={14} className="text-blue-600" strokeWidth={4} />
             ) : sortDirection === 'desc' ? (
-              <ChevronDown size={12} className="text-blue-600" strokeWidth={3} />
+              <ChevronDown size={14} className="text-blue-600" strokeWidth={4} />
             ) : (
-              <ArrowUpDown size={12} className="text-slate-300 group-hover:text-slate-400" />
+              <ArrowUpDown size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors" />
             )}
           </div>
         )}
       </div>
       <div 
-        className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-400/50 transition-colors z-30" 
+        className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 cursor-col-resize hover:bg-blue-400 transition-all z-30" 
         onMouseDown={(e) => { e.stopPropagation(); onResizeStart(e); }}
       />
     </th>
@@ -523,8 +520,8 @@ const HeaderCell: React.FC<{
 };
 
 const SearchItem: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div className="space-y-1.5">
-    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-0.5">{label}</label>
+  <div className="flex flex-col gap-2">
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 leading-none">{label}</label>
     <div className="relative group transition-all">
       {children}
     </div>
