@@ -7,11 +7,11 @@ import {
 import { Material, MaterialStatus, SubmissionType, SubmissionSource } from '../types';
 
 const MOCK_DATA: Material[] = [
-  { id: '1', projectName: '管网新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018369', name: '不锈钢法兰', spec: 'DN50 PN16', brand: 'MAT001', unit: '个', price: 100.00, flowCode: 'PRDDD100001', submissionSource: SubmissionSource.SCP, supplier: '管网新系统甲', submitTime: '2025-12-08 14:30', status: MaterialStatus.PENDING_AUDIT, submissionType: SubmissionType.NEW, description: '耐高压防腐蚀型测试场生成色冯绍峰撒旦法受打击考拉封闭啊哈手打hi发受打破饭卡拉萨放哪拉卡萨到哪看理发年卡老地方啊', auditTime: '-', auditor: '江政韬', auditRemark: '待技术部核准图纸' },
-  { id: '2', projectName: '国网商城', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018329', name: '碳钢阀门', spec: 'DN50 PN16', brand: 'MAT001', unit: '个', price: 100.00, flowCode: 'PRDDD100021', submissionSource: SubmissionSource.COMMODITY_DEPT, supplier: '国网商城乙', submitTime: '2025-12-08 10:15', status: MaterialStatus.PUSH_FAILED, submissionType: SubmissionType.UPDATE, description: '标准碳钢材质', auditTime: '2025-12-08 14:30', auditor: '计碧萍', auditRemark: '资料完整，推送异常，需联系ERP管理员' },
-  { id: '3', projectName: '航发新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018349', name: '压力表', spec: '0-1.6MPa', brand: 'MAT001', unit: '个', price: 100.00, flowCode: 'PRDDD100002', submissionSource: SubmissionSource.SCP, supplier: '航发新系统丙', submitTime: '2025-12-07 16:45', status: MaterialStatus.REJECTED, submissionType: SubmissionType.PRICE_CHANGE, description: '高精度工业级', auditTime: '2025-12-08 14:30', auditor: '张三', auditRemark: '商品图片不符合平台规范，请重新拍摄背景' },
-  { id: '4', projectName: '管网新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018388', name: '密封圈', spec: 'OD100mm', brand: 'MAT002', unit: '件', price: 12.50, flowCode: 'PRDDD100005', submissionSource: SubmissionSource.SCP, supplier: '中化国际', submitTime: '2025-12-09 09:00', status: MaterialStatus.PENDING_AUDIT, submissionType: SubmissionType.NEW, description: '耐油橡胶材质', auditTime: '-', auditor: '江政韬', auditRemark: '' },
-  { id: '5', projectName: '管网新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018399', name: '控制手柄', spec: '通用型', brand: 'MAT003', unit: '台', price: 450.00, flowCode: 'PRDDD100010', submissionSource: SubmissionSource.COMMODITY_DEPT, supplier: '咸亨智造', submitTime: '2025-12-09 11:20', status: MaterialStatus.SALES_AUDITING, submissionType: SubmissionType.RE_PUSH, description: '人体工程学设计', auditTime: '2025-12-09 13:45', auditor: '江政韬', auditRemark: '转交给销售部二次定价' },
+  { id: '1', projectName: '管网新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018369', name: '不锈钢法兰', spec: 'DN50 PN16', brand: '玛特01/MAT001', unit: '个', price: 100.00, flowCode: 'PRDDD100001', submissionSource: SubmissionSource.SCP, supplier: '管网新系统甲', submitTime: '2025-12-08 14:30', status: MaterialStatus.PENDING_AUDIT, submissionType: SubmissionType.NEW, description: '耐高压防腐蚀型测试场生成色冯绍峰撒旦法受打击考拉封闭啊哈手打hi发受打破饭卡拉萨放哪拉卡萨到哪看理发年卡老地方啊', auditTime: '-', auditor: '江政韬', auditRemark: '待技术部核准图纸' },
+  { id: '2', projectName: '国网商城', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018329', name: '碳钢阀门', spec: 'DN50 PN16', brand: '玛特01/MAT001', unit: '个', price: 100.00, flowCode: 'PRDDD100021', submissionSource: SubmissionSource.COMMODITY_DEPT, supplier: '国网商城乙', submitTime: '2025-12-08 10:15', status: MaterialStatus.PUSH_FAILED, submissionType: SubmissionType.UPDATE, description: '标准碳钢材质', auditTime: '2025-12-08 14:30', auditor: '计碧萍', auditRemark: '资料完整，推送异常，需联系ERP管理员' },
+  { id: '3', projectName: '航发新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018349', name: '压力表', spec: '0-1.6MPa', brand: '玛特01/MAT001', unit: '个', price: 100.00, flowCode: 'PRDDD100002', submissionSource: SubmissionSource.SCP, supplier: '航发新系统丙', submitTime: '2025-12-07 16:45', status: MaterialStatus.REJECTED, submissionType: SubmissionType.PRICE_CHANGE, description: '高精度工业级', auditTime: '2025-12-08 14:30', auditor: '张三', auditRemark: '商品图片不符合平台规范，请重新拍摄背景' },
+  { id: '4', projectName: '管网新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018388', name: '密封圈', spec: 'OD100mm', brand: '玛特02/MAT002', unit: '件', price: 12.50, flowCode: 'PRDDD100005', submissionSource: SubmissionSource.SCP, supplier: '中化国际', submitTime: '2025-12-09 09:00', status: MaterialStatus.PENDING_AUDIT, submissionType: SubmissionType.NEW, description: '耐油橡胶材质', auditTime: '-', auditor: '江政韬', auditRemark: '' },
+  { id: '5', projectName: '管网新系统', imageUrl: 'https://xhgj-xhmall-product.oss-cn-shanghai.aliyuncs.com/original/B1506018369/z1.png', code: 'B1506018399', name: '控制手柄', spec: '通用型', brand: '玛特03/MAT003', unit: '台', price: 450.00, flowCode: 'PRDDD100010', submissionSource: SubmissionSource.COMMODITY_DEPT, supplier: '咸亨智造', submitTime: '2025-12-09 11:20', status: MaterialStatus.SALES_AUDITING, submissionType: SubmissionType.RE_PUSH, description: '人体工程学设计', auditTime: '2025-12-09 13:45', auditor: '江政韬', auditRemark: '转交给销售部二次定价' },
 ];
 
 interface Props {
@@ -334,7 +334,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
         </div>
       </div>
 
-      {/* 数据表格 - 样式调整：取消 ID 的蓝色 */}
+      {/* 数据表格 - 样式调整 */}
       <div className="mx-4 mb-4 flex-1 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-auto custom-scrollbar">
           <table className="w-full border-collapse table-fixed select-none">
@@ -405,7 +405,6 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
                       <button onClick={() => onOpenDetail(row)} className="text-[11px] font-black text-[#2e5ef0] hover:underline transition-all">详情</button>
                     </div>
                   </td>
-                  {/* 取消 ID 蓝：改为 slate-600 */}
                   <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-600 truncate font-mono">{row.flowCode}</td>
                   <td className="p-3 border-r border-slate-50 text-[11px] font-black text-slate-700 text-center">{row.submissionSource}</td>
                   <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-800 truncate">{row.projectName}</td>
@@ -419,16 +418,18 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-[11px] font-black text-slate-900 truncate leading-tight">
-                          <span className="text-blue-600 mr-1.5">[{row.brand}]</span> {row.name} {row.spec}
+                          <span className="text-slate-500 mr-1.5">[{row.brand}]</span> {row.name} {row.spec}
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-1 truncate flex items-center gap-1.5">
+                        {/* 优化描述展示：使用 min-w-0 和 span 承载 truncate 以确保在 flex 下生效 */}
+                        <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1.5 min-w-0">
                            <Info size={11} className="shrink-0 text-slate-300" />
-                           {row.description}
+                           <span className="truncate flex-1 font-medium" title={row.description}>
+                             {row.description}
+                           </span>
                         </div>
                       </div>
                     </div>
                   </td>
-                  {/* 取消 ID 蓝：改为 slate-700 */}
                   <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-700 truncate font-mono">{row.code}</td>
                   <td className="p-3 border-r border-slate-50 text-[11px] font-black text-red-500 tabular-nums">¥{row.price.toFixed(2)}</td>
                   <td className="p-3 border-r border-slate-50 text-center">

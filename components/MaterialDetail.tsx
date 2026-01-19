@@ -90,7 +90,8 @@ const MaterialDetail: React.FC<Props> = ({ material, onBack }) => {
             </div>
             <div className="p-2 border-2 border-dashed border-blue-200 rounded-md bg-blue-50/20">
               <div className="text-[12px] font-black text-slate-900 leading-snug">
-                <span className="text-blue-700 mr-1">[{material.brand}]</span> 
+                {/* 取消标蓝：将 text-blue-700 改为 text-slate-500 */}
+                <span className="text-slate-500 mr-1">[{material.brand}]</span> 
                 {material.name} {material.spec} <span className="text-slate-400 font-bold ml-1">({material.unit})</span>
               </div>
               <div className="text-[10px] text-slate-400 mt-1 truncate" title={material.description}>
