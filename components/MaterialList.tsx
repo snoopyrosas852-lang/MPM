@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Search, RotateCcw, Settings2, Check, Layout, X, Info,
-  ArrowUpDown, ChevronUp, ChevronDown, Filter, ChevronRight
+  ArrowUpDown, ChevronUp, ChevronDown, Filter, ChevronRight, Calendar
 } from 'lucide-react';
 import { Material, MaterialStatus, SubmissionType, SubmissionSource } from '../types';
 
@@ -36,6 +36,7 @@ interface SortConfig {
 const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConfig, onOpenDetail }) => {
   const [activeStatus, setActiveStatus] = useState<MaterialStatus>(MaterialStatus.ALL);
   const [showFilterConfig, setShowFilterConfig] = useState(false);
+  const [isFilterExpanded, setIsFilterExpanded] = useState(true);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
 
   const [colWidths, setColWidths] = useState<Record<string, number>>({
@@ -67,9 +68,9 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
     { key: 'submissionType', label: '提报类型', visible: true },
     { key: 'supplier', label: '提报供应商', visible: true },
     { key: 'auditor', label: '审核人', visible: true },
-    { key: 'priceRange', label: '协议价范围', visible: true },
     { key: 'submitTime', label: '提报时间', visible: true },
     { key: 'auditTime', label: '审核时间', visible: true },
+    { key: 'priceRange', label: '协议价范围', visible: true },
     { key: 'auditRemark', label: '审核备注', visible: true },
     { key: 'submissionSource', label: '提报来源', visible: false },
     { key: 'flowCode', label: '审批流编码', visible: true },
@@ -154,7 +155,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
   };
 
   const handleResetDefault = () => {
-    const defaults = ['projectName', 'code', 'name', 'submissionType', 'supplier', 'auditor', 'priceRange', 'submitTime', 'auditTime', 'flowCode'];
+    const defaults = ['projectName', 'code', 'name', 'submissionType', 'supplier', 'auditor', 'submitTime', 'auditTime', 'flowCode'];
     setFilterOptions(prev => prev.map(opt => ({ ...opt, visible: defaults.includes(opt.key) })));
   };
 
@@ -184,113 +185,174 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
   };
 
   const visibleFilters = filterOptions.filter(f => f.visible);
+  
+  // Calculate filters to show based on expansion state
+  const displayedFilters = isFilterExpanded ? visibleFilters : visibleFilters.slice(0, 4);
 
   return (
     <div className="flex flex-col h-full bg-[#f4f7fc]">
-      {/* 增强型筛选面板 */}
-      <div className="bg-white m-4 mb-2 rounded-xl border border-slate-200 shadow-sm p-5 relative">
-        <div className="grid grid-cols-4 gap-x-8 gap-y-4 items-end">
-          {filterOptions.find(f => f.key === 'projectName' && f.visible) && (
+      {/* 增强型筛选面板 - 对应截图顶部搜索区域 */}
+      <div className="bg-white m-4 mb-2 rounded-xl border border-slate-200 shadow-sm p-6 relative">
+        <div className={`grid grid-cols-4 gap-x-8 gap-y-6 items-end transition-all duration-300 overflow-hidden`}>
+          {displayedFilters.some(f => f.key === 'projectName') && (
             <SearchItem label="项目名称">
-              <select className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all">
+              <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all appearance-none cursor-pointer">
                 <option value="">请选择项目</option>
                 <option>管网新系统</option>
                 <option>国网商城</option>
               </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
             </SearchItem>
           )}
-          {filterOptions.find(f => f.key === 'code' && f.visible) && (
+          {displayedFilters.some(f => f.key === 'code') && (
             <SearchItem label="物料编码">
-              <input type="text" placeholder="多个编码用逗号隔开" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+              <input type="text" placeholder="多个编码用逗号隔开" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {filterOptions.find(f => f.key === 'name' && f.visible) && (
+          {displayedFilters.some(f => f.key === 'name') && (
             <SearchItem label="商品名称">
-              <input type="text" placeholder="请输入商品名称关键词" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+              <input type="text" placeholder="请输入商品名称关键词" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {filterOptions.find(f => f.key === 'submissionType' && f.visible) && (
+          {displayedFilters.some(f => f.key === 'submissionType') && (
             <SearchItem label="提报类型">
-              <select className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all">
+              <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all appearance-none cursor-pointer">
                 <option value="">全部类型</option>
                 {Object.values(SubmissionType).map(t => <option key={t} value={t}>{t}</option>)}
               </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
             </SearchItem>
           )}
-          {filterOptions.find(f => f.key === 'supplier' && f.visible) && (
+          
+          {/* Second Row Items */}
+          {displayedFilters.some(f => f.key === 'supplier') && (
             <SearchItem label="提报供应商">
-              <input type="text" placeholder="请输入供应商名称" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+              <input type="text" placeholder="请输入供应商名称" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {filterOptions.find(f => f.key === 'auditor' && f.visible) && (
+          {displayedFilters.some(f => f.key === 'auditor') && (
             <SearchItem label="审核人">
-              <input type="text" placeholder="请输入审核人姓名" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+              <input type="text" placeholder="请输入审核人姓名" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
-          {filterOptions.find(f => f.key === 'submitTime' && f.visible) && (
+          {displayedFilters.some(f => f.key === 'submitTime') && (
             <SearchItem label="提报时间">
-              <input type="date" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all" />
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 group-focus-within:border-blue-500 group-focus-within:bg-white transition-all">
+                <Calendar size={14} className="text-slate-400" />
+                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+                <span className="text-slate-300 text-[10px]">至</span>
+                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+              </div>
             </SearchItem>
           )}
-          {filterOptions.find(f => f.key === 'auditTime' && f.visible) && (
+          {displayedFilters.some(f => f.key === 'auditTime') && (
             <SearchItem label="审核时间">
-              <input type="date" className="w-full bg-slate-50/50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all" />
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 group-focus-within:border-blue-500 group-focus-within:bg-white transition-all">
+                <Calendar size={14} className="text-slate-400" />
+                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+                <span className="text-slate-300 text-[10px]">至</span>
+                <input type="date" className="flex-1 bg-transparent py-2.5 text-[10px] font-bold text-slate-700 outline-none" />
+              </div>
+            </SearchItem>
+          )}
+          
+          {/* Third Row Items */}
+          {displayedFilters.some(f => f.key === 'priceRange') && (
+            <SearchItem label="协议价范围">
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 transition-all group-focus-within:border-blue-500 group-focus-within:bg-white">
+                <span className="text-slate-400 text-[10px]">¥</span>
+                <input type="number" placeholder="最小" className="w-full bg-transparent py-2.5 text-xs font-bold text-slate-700 outline-none" />
+                <span className="text-slate-300">-</span>
+                <input type="number" placeholder="最大" className="w-full bg-transparent py-2.5 text-xs font-bold text-slate-700 outline-none" />
+              </div>
+            </SearchItem>
+          )}
+          {displayedFilters.some(f => f.key === 'auditRemark') && (
+            <SearchItem label="审核备注">
+              <input type="text" placeholder="请输入备注内容" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+            </SearchItem>
+          )}
+          {displayedFilters.some(f => f.key === 'flowCode') && (
+            <SearchItem label="审批流编码">
+              <input type="text" placeholder="请输入编码" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
             </SearchItem>
           )}
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-          <div className="flex gap-2" ref={configRef}>
+        <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+          <div className="flex gap-2 relative" ref={configRef}>
+            {/* 收起/展开筛选按钮 */}
+            {visibleFilters.length > 4 && (
+              <button 
+                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-black text-blue-600 hover:bg-blue-50 active:scale-95 transition-all shadow-sm border-dashed"
+              >
+                {isFilterExpanded ? (
+                  <>收起筛选 <ChevronUp size={16} /></>
+                ) : (
+                  <>展开筛选 <ChevronDown size={16} /></>
+                )}
+              </button>
+            )}
+
+            {/* 对应截图中带虚线的配置按钮 */}
             <button 
               onClick={() => setShowFilterConfig(!showFilterConfig)}
-              className="group flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+              className={`group flex items-center gap-2 px-5 py-2.5 border rounded-lg text-xs font-black transition-all shadow-sm active:scale-95 ${showFilterConfig ? 'bg-blue-50 border-blue-500 text-blue-600 border-dashed ring-2 ring-blue-500/10' : 'bg-white border-slate-200 text-slate-600 border-dashed hover:border-blue-400 hover:text-blue-500'}`}
             >
-              <Settings2 size={15} className="group-hover:rotate-45 transition-transform duration-300" />
+              <Settings2 size={16} className={`${showFilterConfig ? 'rotate-90' : 'group-hover:rotate-45'} transition-transform duration-300`} />
               配置筛项
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:bg-slate-50 active:scale-95 transition-all">
-              <RotateCcw size={15} /> 重置
+            <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:bg-slate-50 active:scale-95 transition-all">
+              <RotateCcw size={16} /> 重置
             </button>
-            <button className="flex items-center gap-2 px-8 py-2 bg-[#2e5ef0] text-white rounded-lg text-xs font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-95">
-              <Search size={15} /> 查询
+            <button className="flex items-center gap-2 px-10 py-2.5 bg-[#2e5ef0] text-white rounded-lg text-xs font-black shadow-lg shadow-blue-500/25 hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-95">
+              <Search size={16} /> 查询
             </button>
 
+            {/* 优化后的配置下拉菜单 */}
             {showFilterConfig && (
-              <div className="absolute right-0 top-full mt-3 w-[340px] bg-white border border-slate-200 shadow-2xl rounded-2xl z-[100] animate-in fade-in zoom-in-95 duration-200 overflow-hidden ring-1 ring-black/5">
-                <div className="p-4 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Layout size={16} className="text-blue-600" />
+              <div className="absolute right-0 top-full mt-4 w-[400px] bg-white border border-slate-200 shadow-2xl rounded-2xl z-[100] animate-in fade-in zoom-in-95 duration-200 overflow-hidden ring-1 ring-black/10">
+                <div className="p-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                      <Layout size={18} className="text-white" />
                     </div>
-                    <span className="text-sm font-black text-slate-800 tracking-tight">配置表格显示字段</span>
+                    <div>
+                      <span className="text-sm font-black text-slate-800 tracking-tight block">搜索项配置</span>
+                      <span className="text-[10px] text-slate-400 font-bold">自定义您的工作台筛选字段</span>
+                    </div>
                   </div>
-                  <button onClick={() => setShowFilterConfig(false)} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors">
-                    <X size={16} />
+                  <button onClick={() => setShowFilterConfig(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors">
+                    <X size={18} />
                   </button>
                 </div>
-                <div className="p-5 max-h-[400px] overflow-y-auto custom-scrollbar bg-white">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.1em]">可用展示列</span>
-                    <div className="flex gap-4">
-                      <button onClick={handleSelectAll} className="text-[11px] font-black text-blue-600 hover:underline">全选</button>
-                      <button onClick={handleResetDefault} className="text-[11px] font-black text-slate-500 hover:underline">重置默认</button>
+                <div className="p-6 bg-white">
+                  <div className="flex justify-between items-center mb-5">
+                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.15em]">可用展示列</span>
+                    <div className="flex gap-5">
+                      <button onClick={handleSelectAll} className="text-[11px] font-black text-blue-600 hover:text-blue-700 transition-colors">全选</button>
+                      <button onClick={handleResetDefault} className="text-[11px] font-black text-slate-400 hover:text-slate-600 transition-colors">重置默认</button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4 max-h-[320px] overflow-y-auto custom-scrollbar pr-2">
                     {filterOptions.map(opt => (
-                      <label key={opt.key} className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer border transition-all ${opt.visible ? 'bg-blue-50/50 border-blue-200 ring-2 ring-blue-500/5' : 'border-slate-100 hover:border-slate-300'}`}>
+                      <label key={opt.key} className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-all ${opt.visible ? 'bg-blue-50/40 border-blue-200 shadow-sm' : 'border-slate-100 hover:border-slate-300'}`}>
                         <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${opt.visible ? 'bg-blue-600 border-blue-600 shadow-sm' : 'bg-white border-slate-300'}`}>
-                          {opt.visible && <Check size={12} className="text-white" strokeWidth={3} />}
+                          {opt.visible && <Check size={12} className="text-white" strokeWidth={4} />}
                           <input type="checkbox" className="hidden" checked={opt.visible} onChange={() => toggleFilterVisibility(opt.key)} />
                         </div>
-                        <span className={`text-xs font-bold ${opt.visible ? 'text-blue-700' : 'text-slate-600'}`}>{opt.label}</span>
+                        <span className={`text-[11px] font-bold ${opt.visible ? 'text-blue-700' : 'text-slate-500'}`}>{opt.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
-                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] font-black text-slate-500">已选 {visibleFilters.length} 个字段</span>
-                  <button onClick={() => setShowFilterConfig(false)} className="px-6 py-2 bg-[#2e5ef0] text-white rounded-xl text-xs font-black shadow-md hover:bg-blue-700 transition-all active:scale-95">保存设置</button>
+                <div className="p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-[11px] font-black text-slate-600">当前已选 {visibleFilters.length} 个字段</span>
+                    <span className="text-[9px] text-slate-400 font-medium">配置将自动保存到本地</span>
+                  </div>
+                  <button onClick={() => setShowFilterConfig(false)} className="px-8 py-2.5 bg-[#2e5ef0] text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all active:scale-95">完成设置</button>
                 </div>
               </div>
             )}
@@ -298,15 +360,15 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
         </div>
       </div>
 
-      {/* 状态滑块 - 优化 */}
-      <div className="mx-4 mb-4 flex gap-1 items-center bg-slate-200/50 p-1.5 rounded-xl w-fit shadow-inner">
+      {/* 状态切换栏 - 对应截图下方状态Tab */}
+      <div className="mx-4 mb-4 flex gap-1 items-center bg-slate-200/50 p-1.5 rounded-xl w-fit shadow-inner mt-2">
         {Object.values(MaterialStatus).map((s) => (
           <button
             key={s}
             onClick={() => setActiveStatus(s)}
-            className={`px-5 py-2 text-xs font-black transition-all rounded-lg ${
+            className={`px-6 py-2 text-xs font-black transition-all rounded-lg ${
               activeStatus === s 
-                ? 'bg-white text-blue-600 shadow-sm ring-1 ring-black/5' 
+                ? 'bg-white text-blue-600 shadow-md ring-1 ring-black/5 scale-105' 
                 : 'text-slate-500 hover:text-slate-700 hover:bg-white/40'
             }`}
           >
@@ -315,7 +377,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
         ))}
       </div>
 
-      {/* 批量操作 - 优化 */}
+      {/* 批量操作与核心功能按钮 */}
       <div className="mx-4 mb-4 flex justify-between items-center">
         <div className="flex gap-2">
           {['批量重推', '批量审核', '提交销售审核', '导出物料', '导出明细'].map(btn => (
@@ -325,16 +387,16 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
           ))}
         </div>
         <div className="flex gap-3">
-          <button onClick={onOpenReviewerConfig} className="flex items-center gap-2 px-5 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-black shadow-sm hover:border-blue-500 hover:text-blue-600 transition-all active:scale-95">
-             <Filter size={14} /> 商品审核人配置
+          <button onClick={onOpenReviewerConfig} className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-black shadow-sm hover:border-blue-500 hover:text-blue-600 transition-all active:scale-95">
+             <Filter size={15} /> 商品审核人配置
           </button>
-          <button onClick={onOpenProjectConfig} className="flex items-center gap-2 px-5 py-2 bg-[#2e5ef0] text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all active:scale-95">
-             项目提报配置 <ChevronRight size={14} />
+          <button onClick={onOpenProjectConfig} className="flex items-center gap-2 px-6 py-2.5 bg-[#2e5ef0] text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all active:scale-95">
+             项目提报配置 <ChevronRight size={15} />
           </button>
         </div>
       </div>
 
-      {/* 数据表格 - 样式调整 */}
+      {/* 数据表格主体 */}
       <div className="mx-4 mb-4 flex-1 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-auto custom-scrollbar">
           <table className="w-full border-collapse table-fixed select-none">
@@ -420,7 +482,6 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
                         <div className="text-[11px] font-black text-slate-900 truncate leading-tight">
                           <span className="text-slate-500 mr-1.5">[{row.brand}]</span> {row.name} {row.spec}
                         </div>
-                        {/* 优化描述展示：使用 min-w-0 和 span 承载 truncate 以确保在 flex 下生效 */}
                         <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1.5 min-w-0">
                            <Info size={11} className="shrink-0 text-slate-300" />
                            <span className="truncate flex-1 font-medium" title={row.description}>
@@ -521,9 +582,9 @@ const HeaderCell: React.FC<{
 };
 
 const SearchItem: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div className="flex flex-col gap-2">
-    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 leading-none">{label}</label>
-    <div className="relative group transition-all">
+  <div className="flex flex-col gap-2 relative group">
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.1em] pl-1 leading-none">{label}</label>
+    <div className="relative">
       {children}
     </div>
   </div>
