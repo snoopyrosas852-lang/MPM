@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
-  Search, RotateCcw, Settings2, Check, Layout, X, Info,
+  Search, RotateCcw, Check, Layout, X, Info,
   ArrowUpDown, ChevronUp, ChevronDown, Filter, ChevronRight, Calendar,
   Download, FileText, Send, ShieldCheck, UserPlus, ClipboardCheck
 } from 'lucide-react';
@@ -69,8 +69,7 @@ interface SortConfig {
 
 const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConfig, onOpenDetail }) => {
   const [activeStatus, setActiveStatus] = useState<MaterialStatus>(MaterialStatus.ALL);
-  const [showFilterConfig, setShowFilterConfig] = useState(false);
-  const [isFilterExpanded, setIsFilterExpanded] = useState(true);
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'submitTime', direction: 'desc' });
   
   // 分页状态
@@ -82,7 +81,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   const [colWidths, setColWidths] = useState<Record<string, number>>({
     selection: 46,
-    ops: 80,
+    ops: 120, // 增加操作列宽度以容纳更多按钮
     flowId: 130,
     source: 90,
     project: 140,
@@ -102,7 +101,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
   const startX = useRef<number>(0);
   const startWidth = useRef<number>(0);
 
-  const [filterOptions, setFilterOptions] = useState<FilterOption[]>([
+  const [filterOptions] = useState<FilterOption[]>([
     { key: 'projectName', label: '项目名称', visible: true, order: 1 },
     { key: 'code', label: '物料编码', visible: true, order: 2 },
     { key: 'name', label: '商品名称', visible: true, order: 3 },
@@ -115,18 +114,6 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
     { key: 'auditRemark', label: '审核备注', visible: true, order: 10 },
     { key: 'flowCode', label: '审批流编码', visible: true, order: 11 },
   ]);
-
-  const configRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (configRef.current && !configRef.current.contains(event.target as Node)) {
-        setShowFilterConfig(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -209,10 +196,10 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   const getStatusStyle = (s: MaterialStatus) => {
     switch (s) {
-      case MaterialStatus.PENDING_AUDIT: return 'bg-blue-50 text-blue-600 border-blue-200';
+      case MaterialStatus.PENDING_AUDIT: return 'bg-blue-50 text-blue-500 border-blue-200';
       case MaterialStatus.APPROVED: return 'bg-emerald-50 text-emerald-600 border-emerald-200';
       case MaterialStatus.REJECTED: return 'bg-red-50 text-red-500 border-red-200';
-      case MaterialStatus.PUSH_FAILED: return 'bg-orange-50 text-orange-600 border-orange-200';
+      case MaterialStatus.PUSH_FAILED: return 'bg-orange-50 text-orange-500 border-orange-200';
       case MaterialStatus.SALES_AUDITING: return 'bg-indigo-50 text-indigo-600 border-indigo-200';
       case MaterialStatus.PUSHED: return 'bg-slate-50 text-slate-600 border-slate-200';
       case MaterialStatus.PENDING_SALES_AUDIT: return 'bg-blue-50 text-blue-500 border-blue-200';
@@ -329,12 +316,12 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   return (
     <div className="flex flex-col h-full bg-[#f4f7fc]">
-      {/* 优化后的筛选面板 - 遵循截图中的间距与圆角 */}
+      {/* 优化后的筛选面板 - 遵循截图中的布局调整 */}
       <div className="bg-white m-4 mb-2 rounded-lg border border-slate-200 shadow-sm p-6 relative transition-all duration-300">
         <div className={`grid grid-cols-4 gap-x-8 gap-y-6 items-end transition-all duration-500`}>
           {visibleFilters.map((opt, index) => {
-             // 默认显示前 4 个，展开后全显示
-             if (!isFilterExpanded && index >= 8) return null;
+             // 收起时显示前 4 个（刚好一行），展开后全显示
+             if (!isFilterExpanded && index >= 4) return null;
              return (
                <div key={opt.key} className="transition-all duration-300 animate-in fade-in slide-in-from-top-1">
                  {renderSearchItem(opt.key, opt.label)}
@@ -344,7 +331,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
         </div>
 
         <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
-          <div className="flex gap-2 relative" ref={configRef}>
+          <div className="flex gap-2 relative">
             <button 
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-[#2e5ef0] rounded-lg text-xs font-bold text-[#2e5ef0] hover:bg-blue-50 transition-all active:scale-95 shadow-sm"
@@ -354,13 +341,6 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
             </button>
 
             <button 
-              onClick={() => setShowFilterConfig(!showFilterConfig)}
-              className={`group flex items-center gap-2 px-4 py-2 border rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95 ${showFilterConfig ? 'bg-blue-50 border-blue-500 text-blue-600 border-dashed ring-2 ring-blue-500/10' : 'bg-white border-slate-200 text-slate-600 border-dashed hover:border-blue-400 hover:text-blue-500'}`}
-            >
-              <Settings2 size={16} className={`${showFilterConfig ? 'rotate-90' : 'group-hover:rotate-45'} transition-transform duration-300`} />
-              配置筛项
-            </button>
-            <button 
                onClick={() => {setCurrentPage(1); setActiveStatus(MaterialStatus.ALL);}}
                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition-all"
             >
@@ -369,39 +349,11 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
             <button className="flex items-center gap-2 px-8 py-2 bg-[#2e5ef0] text-white rounded-lg text-xs font-bold shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all active:scale-95">
               <Search size={16} /> 查询
             </button>
-
-            {/* 配置下拉菜单 */}
-            {showFilterConfig && (
-              <div className="absolute right-0 top-full mt-2 w-[400px] bg-white border border-slate-200 shadow-2xl rounded-xl z-[100] animate-in fade-in zoom-in-95 duration-200 overflow-hidden ring-1 ring-black/10">
-                <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Layout size={16} className="text-blue-600" />
-                    <span className="text-xs font-black text-slate-800">搜索项配置</span>
-                  </div>
-                </div>
-                <div className="p-4 bg-white">
-                  <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                    {filterOptions.sort((a, b) => a.order - b.order).map(opt => (
-                      <label key={opt.key} className={`flex items-center gap-2 p-2 rounded cursor-pointer border transition-all ${opt.visible ? 'bg-blue-50/40 border-blue-200' : 'border-slate-100 hover:border-slate-300'}`}>
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${opt.visible ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'}`}>
-                          {opt.visible && <Check size={10} className="text-white" strokeWidth={4} />}
-                          <input type="checkbox" className="hidden" checked={opt.visible} onChange={() => setFilterOptions(prev => prev.map(f => f.key === opt.key ? {...f, visible: !f.visible} : f))} />
-                        </div>
-                        <span className={`text-[11px] font-bold ${opt.visible ? 'text-blue-700' : 'text-slate-500'}`}>{opt.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end">
-                  <button onClick={() => setShowFilterConfig(false)} className="px-6 py-1.5 bg-[#2e5ef0] text-white rounded text-xs font-bold shadow-sm hover:bg-blue-700 transition-all">完成</button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* 状态切换栏 - 高度还原截图 */}
+      {/* 状态切换栏 */}
       <div className="mx-4 mb-3 flex gap-1 items-center bg-[#e7eefe]/50 p-1 rounded-lg w-fit shadow-inner mt-2">
         {Object.values(MaterialStatus).map((s) => (
           <button
@@ -520,7 +472,15 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
                     />
                   </td>
                   <td className="p-3 border-r border-slate-50 text-center" onClick={e => e.stopPropagation()}>
-                    <button onClick={() => onOpenDetail(row)} className="text-[11px] font-bold text-[#2e5ef0] hover:underline transition-all">查看</button>
+                    <div className="flex justify-center items-center gap-2">
+                      {row.status === MaterialStatus.PENDING_AUDIT && (
+                        <>
+                          <button className="text-[11px] font-bold text-blue-600 hover:underline transition-all whitespace-nowrap">通过</button>
+                          <button className="text-[11px] font-bold text-red-500 hover:underline transition-all whitespace-nowrap">驳回</button>
+                        </>
+                      )}
+                      <button onClick={() => onOpenDetail(row)} className="text-[11px] font-bold text-[#2e5ef0] hover:underline transition-all whitespace-nowrap">查看</button>
+                    </div>
                   </td>
                   <td className="p-3 border-r border-slate-50 text-[11px] font-medium text-slate-500 truncate font-mono">{row.flowCode}</td>
                   <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-700 text-center">{row.submissionSource}</td>
