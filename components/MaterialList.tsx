@@ -3,7 +3,8 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Search, RotateCcw, Check, Layout, X, Info,
   ArrowUpDown, ChevronUp, ChevronDown, Filter, ChevronRight, Calendar,
-  Download, FileText, Send, ShieldCheck, UserPlus, ClipboardCheck
+  Download, FileText, Send, ShieldCheck, UserPlus, ClipboardCheck,
+  MoreHorizontal
 } from 'lucide-react';
 import { Material, MaterialStatus, SubmissionType, SubmissionSource } from '../types';
 
@@ -81,7 +82,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   const [colWidths, setColWidths] = useState<Record<string, number>>({
     selection: 46,
-    ops: 120, // 增加操作列宽度以容纳更多按钮
+    ops: 120,
     flowId: 130,
     source: 90,
     project: 140,
@@ -221,94 +222,63 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
     return labels[s] || s;
   };
 
-  const visibleFilters = useMemo(() => filterOptions.filter(f => f.visible).sort((a, b) => a.order - b.order), [filterOptions]);
-
-  const renderSearchItem = (key: string, label: string) => {
+  const renderSearchItem = (key: string, label: string, isCompact?: boolean) => {
+    const commonStyles = "w-full bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-[11px] outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/5 text-slate-700 font-bold transition-all";
+    
     switch (key) {
       case 'projectName':
         return (
-          <SearchItem label={label}>
+          <SearchItem label={label} isCompact={isCompact}>
             <div className="relative group">
-              <select className="w-full bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 text-slate-700 font-bold transition-all appearance-none cursor-pointer">
+              <select className={`${commonStyles} appearance-none cursor-pointer`}>
                 <option value="">全部项目</option>
                 <option>管网新系统</option>
                 <option>国网商城</option>
                 <option>航发新系统</option>
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-focus-within:text-blue-500 transition-colors" size={14} />
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={12} />
             </div>
           </SearchItem>
         );
       case 'code':
         return (
-          <SearchItem label={label}>
-            <input type="text" placeholder="多个编码用逗号隔开" className="w-full bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+          <SearchItem label={label} isCompact={isCompact}>
+            <input type="text" placeholder="物料编码..." className={commonStyles} />
           </SearchItem>
         );
       case 'name':
         return (
-          <SearchItem label={label}>
-            <input type="text" placeholder="请输入商品名称关键词" className="w-full bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+          <SearchItem label={label} isCompact={isCompact}>
+            <input type="text" placeholder="商品名称关键词" className={commonStyles} />
           </SearchItem>
         );
       case 'submissionType':
         return (
-          <SearchItem label={label}>
+          <SearchItem label={label} isCompact={isCompact}>
             <div className="relative group">
-              <select className="w-full bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all appearance-none cursor-pointer">
+              <select className={`${commonStyles} appearance-none cursor-pointer`}>
                 <option value="">全部类型</option>
                 {Object.values(SubmissionType).map(t => <option key={t} value={t}>{t}</option>)}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-focus-within:text-blue-500 transition-colors" size={14} />
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={12} />
             </div>
           </SearchItem>
         );
       case 'submitTime':
       case 'auditTime':
         return (
-          <SearchItem label={label}>
-            <div className="flex items-center gap-0 bg-slate-50 border border-slate-200 rounded focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/5 transition-all overflow-hidden group/range">
-              <div className="relative flex-1">
-                <input 
-                  type="date" 
-                  placeholder="开始日期"
-                  className="w-full bg-transparent px-3 pl-8 py-2 text-[11px] outline-none font-bold cursor-pointer text-slate-600 appearance-none" 
-                />
-                <Calendar size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover/range:text-blue-500 transition-colors" />
-              </div>
-              <span className="text-slate-300 font-bold px-1 select-none">~</span>
-              <div className="relative flex-1">
-                <input 
-                  type="date" 
-                  placeholder="结束日期"
-                  className="w-full bg-transparent px-3 py-2 text-[11px] outline-none font-bold cursor-pointer text-slate-600 appearance-none" 
-                />
-              </div>
-            </div>
-          </SearchItem>
-        );
-      case 'priceRange':
-        return (
-          <SearchItem label={label}>
-            <div className="flex items-center gap-0 bg-slate-50 border border-slate-200 rounded focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/5 transition-all overflow-hidden group/price">
-              <input 
-                type="number" 
-                placeholder="最低价格"
-                className="w-full bg-transparent px-3 py-2 text-xs outline-none font-bold text-slate-600 appearance-none" 
-              />
-              <span className="text-slate-300 font-bold px-1 select-none">~</span>
-              <input 
-                type="number" 
-                placeholder="最高价格"
-                className="w-full bg-transparent px-3 py-2 text-xs outline-none font-bold text-slate-600 appearance-none" 
-              />
+          <SearchItem label={label} isCompact={isCompact}>
+            <div className="flex items-center gap-0 bg-slate-50 border border-slate-200 rounded focus-within:border-blue-500 focus-within:bg-white transition-all overflow-hidden">
+              <input type="date" className="bg-transparent px-2 py-1.5 text-[10px] outline-none font-bold w-full cursor-pointer" />
+              <span className="text-slate-300 font-bold px-1 text-[10px]">~</span>
+              <input type="date" className="bg-transparent px-2 py-1.5 text-[10px] outline-none font-bold w-full cursor-pointer" />
             </div>
           </SearchItem>
         );
       default:
         return (
-          <SearchItem label={label}>
-            <input type="text" placeholder={`请输入${label}`} className="w-full bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold transition-all" />
+          <SearchItem label={label} isCompact={isCompact}>
+            <input type="text" placeholder={`请输入${label}`} className={commonStyles} />
           </SearchItem>
         );
     }
@@ -316,89 +286,88 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
 
   return (
     <div className="flex flex-col h-full bg-[#f4f7fc]">
-      {/* 优化后的筛选面板 - 遵循截图中的布局调整 */}
-      <div className="bg-white m-4 mb-2 rounded-lg border border-slate-200 shadow-sm p-6 relative transition-all duration-300">
-        <div className={`grid grid-cols-4 gap-x-8 gap-y-6 items-end transition-all duration-500`}>
-          {visibleFilters.map((opt, index) => {
-             // 收起时显示前 4 个（刚好一行），展开后全显示
-             if (!isFilterExpanded && index >= 4) return null;
-             return (
-               <div key={opt.key} className="transition-all duration-300 animate-in fade-in slide-in-from-top-1">
-                 {renderSearchItem(opt.key, opt.label)}
-               </div>
-             );
-          })}
-        </div>
-
-        <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
-          <div className="flex gap-2 relative">
+      {/* 极简筛选面板 */}
+      <div className="bg-white m-4 mb-2 rounded border border-slate-200 shadow-sm p-4 relative transition-all duration-300">
+        <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
+          {/* 第一排始终显示的字段 */}
+          <div className="flex-1 min-w-[200px]">{renderSearchItem('projectName', '项目名称', true)}</div>
+          <div className="flex-1 min-w-[150px]">{renderSearchItem('code', '物料编码', true)}</div>
+          <div className="flex-1 min-w-[150px]">{renderSearchItem('name', '商品名称', true)}</div>
+          
+          <div className="flex items-center gap-2 pb-0.5">
+            <button className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2e5ef0] text-white rounded text-[11px] font-bold shadow hover:bg-blue-700 transition-all active:scale-95">
+              <Search size={14} /> 查询
+            </button>
+            <button 
+              onClick={() => {setCurrentPage(1); setActiveStatus(MaterialStatus.ALL);}}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-all"
+            >
+              <RotateCcw size={14} /> 重置
+            </button>
             <button 
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-[#2e5ef0] rounded-lg text-xs font-bold text-[#2e5ef0] hover:bg-blue-50 transition-all active:scale-95 shadow-sm"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-bold transition-all border ${isFilterExpanded ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-white border-slate-200 text-slate-600'}`}
             >
-              {isFilterExpanded ? '收起筛选' : '展开筛选'}
-              {isFilterExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-
-            <button 
-               onClick={() => {setCurrentPage(1); setActiveStatus(MaterialStatus.ALL);}}
-               className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition-all"
-            >
-              <RotateCcw size={16} /> 重置
-            </button>
-            <button className="flex items-center gap-2 px-8 py-2 bg-[#2e5ef0] text-white rounded-lg text-xs font-bold shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all active:scale-95">
-              <Search size={16} /> 查询
+              {isFilterExpanded ? '收起' : '更多'}
+              {isFilterExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
           </div>
         </div>
+
+        {/* 扩展筛选区域 */}
+        {isFilterExpanded && (
+          <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-4 gap-6 animate-in slide-in-from-top-2 duration-300">
+             <div>{renderSearchItem('submissionType', '提报类型')}</div>
+             <div>{renderSearchItem('supplier', '提报供应商')}</div>
+             <div>{renderSearchItem('auditor', '审核人')}</div>
+             <div>{renderSearchItem('submitTime', '提报时间')}</div>
+             <div>{renderSearchItem('auditTime', '审核时间')}</div>
+             <div>{renderSearchItem('priceRange', '协议价范围')}</div>
+             <div>{renderSearchItem('auditRemark', '审核备注')}</div>
+             <div>{renderSearchItem('flowCode', '审批流编码')}</div>
+          </div>
+        )}
       </div>
 
-      {/* 状态切换栏 */}
-      <div className="mx-4 mb-3 flex gap-1 items-center bg-[#e7eefe]/50 p-1 rounded-lg w-fit shadow-inner mt-2">
-        {Object.values(MaterialStatus).map((s) => (
-          <button
-            key={s}
-            onClick={() => {setActiveStatus(s); setCurrentPage(1);}}
-            className={`px-5 py-1.5 text-xs font-bold transition-all rounded whitespace-nowrap ${
-              activeStatus === s 
-                ? 'bg-white text-blue-600 shadow shadow-blue-500/10' 
-                : 'text-slate-500 hover:text-slate-700 hover:bg-white/40'
-            }`}
-          >
-            {getStatusLabel(s)}
-            <span className="ml-1.5 opacity-50 font-medium">({s === MaterialStatus.ALL ? filteredData.length : filteredData.filter(d => d.status === s).length})</span>
-          </button>
-        ))}
-      </div>
+      {/* 状态与操作组合栏 - 进一步压缩空间 */}
+      <div className="mx-4 mb-2 flex flex-wrap items-center justify-between gap-4 mt-1">
+        <div className="flex gap-0.5 items-center bg-slate-200/50 p-0.5 rounded border border-slate-200">
+          {Object.values(MaterialStatus).map((s) => (
+            <button
+              key={s}
+              onClick={() => {setActiveStatus(s); setCurrentPage(1);}}
+              className={`px-4 py-1.5 text-[10px] font-bold transition-all rounded whitespace-nowrap ${
+                activeStatus === s 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-white/40'
+              }`}
+            >
+              {getStatusLabel(s)}
+              <span className="ml-1 opacity-50 font-medium">({s === MaterialStatus.ALL ? filteredData.length : filteredData.filter(d => d.status === s).length})</span>
+            </button>
+          ))}
+        </div>
 
-      {/* 操作按钮栏 */}
-      <div className="mx-4 mb-3 flex justify-between items-center">
-        <div className="flex gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-700 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95 disabled:opacity-40" disabled={selectedIds.size === 0}>
-            <Send size={13} /> 批量审核
+        <div className="flex gap-2 items-center">
+          <div className="flex gap-1 pr-4 border-r border-slate-200">
+            <button className="flex items-center gap-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded text-[10px] font-bold text-slate-700 hover:border-blue-500 transition-all disabled:opacity-40" disabled={selectedIds.size === 0}>
+              <Send size={12} /> 批量审核
+            </button>
+            <button className="flex items-center gap-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded text-[10px] font-bold text-slate-700 hover:border-blue-500 transition-all">
+              <Download size={12} /> 导出
+            </button>
+          </div>
+          <button onClick={onOpenReviewerConfig} className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded text-[10px] font-bold hover:text-blue-600 transition-all">
+             <ShieldCheck size={13} /> 审核人配置
           </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-700 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95">
-            <Download size={13} /> 导出物料
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold text-slate-700 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm active:scale-95">
-            <FileText size={13} /> 导出明细
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-dashed border-blue-300 text-blue-600 rounded text-xs font-bold hover:bg-blue-50 transition-all shadow-sm active:scale-95 disabled:opacity-40" disabled={selectedIds.size === 0}>
-            <ClipboardCheck size={13} /> 提交销售审核
+          <button onClick={onOpenProjectConfig} className="flex items-center gap-1 px-3 py-1.5 bg-[#2e5ef0] text-white rounded text-[10px] font-bold shadow hover:bg-blue-700 transition-all">
+             项目提报配置 <ChevronRight size={13} />
           </button>
         </div>
-        <div className="flex gap-2">
-          <button onClick={onOpenReviewerConfig} className="flex items-center gap-1.5 px-4 py-1.5 bg-white border border-slate-200 text-slate-700 rounded text-xs font-bold shadow-sm hover:border-blue-500 hover:text-blue-600 transition-all active:scale-95">
-             <ShieldCheck size={14} /> 审核人配置
-          </button>
-          <button onClick={onOpenProjectConfig} className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2e5ef0] text-white rounded text-xs font-bold shadow-md hover:bg-blue-700 transition-all active:scale-95">
-             项目提报配置 <ChevronRight size={14} />
-          </button>
-        </div>
       </div>
 
-      {/* 数据表格主体 */}
-      <div className="mx-4 mb-4 flex-1 bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col overflow-hidden">
+      {/* 表格容器 */}
+      <div className="mx-4 mb-4 flex-1 bg-white border border-slate-200 rounded shadow-sm flex flex-col overflow-hidden">
         <div className="flex-1 overflow-auto custom-scrollbar relative">
           <table className="w-full border-collapse table-fixed select-none">
             <colgroup>
@@ -423,7 +392,7 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
                 <th className="p-2 border-r border-b border-slate-200 text-center">
                   <input 
                     type="checkbox" 
-                    className="w-4 h-4 rounded border-slate-300 accent-blue-600 cursor-pointer" 
+                    className="w-3.5 h-3.5 rounded border-slate-300 accent-blue-600 cursor-pointer" 
                     checked={paginatedData.length > 0 && selectedIds.size === paginatedData.length}
                     onChange={toggleSelectAll}
                   />
@@ -435,8 +404,8 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
                 <HeaderCell label="提报类型" onResizeStart={(e) => onResizeStart(e, 'subType')} />
                 <HeaderCell label="商品信息" onResizeStart={(e) => onResizeStart(e, 'productInfo')} />
                 <HeaderCell label="商品编码" onResizeStart={(e) => onResizeStart(e, 'code')} />
-                <HeaderCell label="协议价 (元)" onResizeStart={(e) => onResizeStart(e, 'price')} sortable sortDirection={sortConfig.key === 'price' ? sortConfig.direction : null} onSort={() => handleSort('price')} />
-                <HeaderCell label="当前状态" onResizeStart={(e) => onResizeStart(e, 'status')} />
+                <HeaderCell label="协议价" onResizeStart={(e) => onResizeStart(e, 'price')} sortable sortDirection={sortConfig.key === 'price' ? sortConfig.direction : null} onSort={() => handleSort('price')} />
+                <HeaderCell label="状态" onResizeStart={(e) => onResizeStart(e, 'status')} />
                 <HeaderCell label="审核人" onResizeStart={(e) => onResizeStart(e, 'auditor')} />
                 <HeaderCell 
                   label="提报时间" 
@@ -463,67 +432,65 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
                   className={`hover:bg-blue-50/40 transition-colors group cursor-default ${selectedIds.has(row.id) ? 'bg-blue-50/20' : ''}`}
                   onClick={() => toggleSelectRow(row.id)}
                 >
-                  <td className="p-3 text-center border-r border-slate-50">
+                  <td className="p-2.5 text-center border-r border-slate-50">
                     <input 
                       type="checkbox" 
-                      className="w-4 h-4 rounded border-slate-300 accent-blue-600 cursor-pointer" 
+                      className="w-3.5 h-3.5 rounded border-slate-300 accent-blue-600 cursor-pointer" 
                       checked={selectedIds.has(row.id)}
                       readOnly
                     />
                   </td>
-                  <td className="p-3 border-r border-slate-50 text-center" onClick={e => e.stopPropagation()}>
+                  <td className="p-2.5 border-r border-slate-50 text-center" onClick={e => e.stopPropagation()}>
                     <div className="flex justify-center items-center gap-2">
                       {row.status === MaterialStatus.PENDING_AUDIT && (
                         <>
-                          <button className="text-[11px] font-bold text-blue-600 hover:underline transition-all whitespace-nowrap">通过</button>
-                          <button className="text-[11px] font-bold text-red-500 hover:underline transition-all whitespace-nowrap">驳回</button>
+                          <button className="text-[10px] font-bold text-blue-600 hover:underline">通过</button>
+                          <button className="text-[10px] font-bold text-red-500 hover:underline">驳回</button>
                         </>
                       )}
-                      <button onClick={() => onOpenDetail(row)} className="text-[11px] font-bold text-[#2e5ef0] hover:underline transition-all whitespace-nowrap">查看</button>
+                      <button onClick={() => onOpenDetail(row)} className="text-[10px] font-bold text-[#2e5ef0] hover:underline">查看</button>
                     </div>
                   </td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-medium text-slate-500 truncate font-mono">{row.flowCode}</td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-700 text-center">{row.submissionSource}</td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-800 truncate">{row.projectName}</td>
-                  <td className="p-3 border-r border-slate-50 text-center">
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] rounded font-bold whitespace-nowrap">{row.submissionType}</span>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-medium text-slate-500 truncate font-mono">{row.flowCode}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-bold text-slate-700 text-center">{row.submissionSource}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-bold text-slate-800 truncate">{row.projectName}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-center">
+                    <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[9px] rounded font-bold">{row.submissionType}</span>
                   </td>
-                  <td className="p-3 border-r border-slate-50">
-                    <div className="flex items-center gap-3">
-                      <div className="shrink-0 w-10 h-10 rounded border border-slate-100 overflow-hidden bg-white shadow-sm transition-transform">
-                        <img src={row.imageUrl} alt="" className="w-full h-full object-contain p-1" />
+                  <td className="p-2.5 border-r border-slate-50">
+                    <div className="flex items-center gap-2">
+                      <div className="shrink-0 w-8 h-8 rounded border border-slate-100 overflow-hidden bg-white">
+                        <img src={row.imageUrl} alt="" className="w-full h-full object-contain p-0.5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[11px] font-bold text-slate-900 truncate leading-tight">
+                        <div className="text-[10px] font-bold text-slate-900 truncate leading-tight">
                           <span className="text-slate-400 mr-1">[{row.brand}]</span> {row.name}
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5 truncate italic">
+                        <div className="text-[9px] text-slate-400 truncate italic">
                            {row.spec}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-medium text-slate-700 truncate font-mono">{row.code}</td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-black text-red-500 tabular-nums">¥{row.price.toFixed(2)}</td>
-                  <td className="p-3 border-r border-slate-50 text-center">
-                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border ${getStatusStyle(row.status)}`}>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-medium text-slate-700 truncate font-mono">{row.code}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-black text-red-500 tabular-nums text-right">¥{row.price.toFixed(2)}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-center">
+                    <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold border ${getStatusStyle(row.status)}`}>
                       {getStatusLabel(row.status)}
                     </span>
                   </td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-bold text-slate-800 text-center">{row.auditor || '-'}</td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-medium text-slate-500 font-mono text-center">{row.submitTime}</td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-medium text-slate-500 font-mono text-center">{row.auditTime}</td>
-                  <td className="p-3 border-r border-slate-50 text-[11px] font-medium text-slate-600 truncate" title={row.auditRemark}>
-                    {row.auditRemark || '-'}
-                  </td>
-                  <td className="p-3 text-[11px] text-slate-800 font-bold truncate">{row.supplier}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-bold text-slate-800 text-center">{row.auditor || '-'}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-medium text-slate-500 font-mono text-center">{row.submitTime}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-medium text-slate-500 font-mono text-center">{row.auditTime}</td>
+                  <td className="p-2.5 border-r border-slate-50 text-[10px] font-medium text-slate-600 truncate">{row.auditRemark || '-'}</td>
+                  <td className="p-2.5 text-[10px] text-slate-800 font-bold truncate">{row.supplier}</td>
                 </tr>
               )) : (
                 <tr>
                   <td colSpan={15} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-2 opacity-20">
-                      <Search size={48} />
-                      <span className="text-sm font-black">未找到匹配的物料数据</span>
+                      <Search size={40} />
+                      <span className="text-[12px] font-black">暂无匹配数据</span>
                     </div>
                   </td>
                 </tr>
@@ -532,62 +499,54 @@ const MaterialList: React.FC<Props> = ({ onOpenReviewerConfig, onOpenProjectConf
           </table>
         </div>
         
-        {/* 分页栏 */}
-        <div className="px-6 py-3 bg-white border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-500">
+        {/* 紧凑型分页栏 */}
+        <div className="px-4 py-2 bg-[#f8fafc] border-t border-slate-200 flex items-center justify-between text-[10px] font-bold text-slate-500">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <span>共计</span>
               <span className="text-blue-600 font-black">{filteredData.length}</span>
               <span>条记录</span>
               {selectedIds.size > 0 && (
-                <div className="ml-2 px-1.5 py-0.5 bg-blue-500 text-white rounded text-[9px]">已选 {selectedIds.size} 项</div>
+                <div className="ml-2 px-1.5 py-0.5 bg-blue-500 text-white rounded text-[8px]">已选 {selectedIds.size} 项</div>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              每页显示
-              <select 
-                value={pageSize}
-                onChange={(e) => {setPageSize(Number(e.target.value)); setCurrentPage(1);}}
-                className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-slate-700 outline-none cursor-pointer"
-              >
-                {[20, 50, 100].map(v => <option key={v} value={v}>{v}</option>)}
-              </select>
-              条
-            </div>
+            <select 
+              value={pageSize}
+              onChange={(e) => {setPageSize(Number(e.target.value)); setCurrentPage(1);}}
+              className="bg-white border border-slate-200 rounded px-1 text-slate-700 outline-none h-6"
+            >
+              {[20, 50, 100].map(v => <option key={v} value={v}>{v}条/页</option>)}
+            </select>
           </div>
           <div className="flex gap-1 items-center">
             <button 
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(p => p - 1)}
-              className="px-2.5 py-1 bg-white border border-slate-200 rounded text-slate-500 hover:bg-slate-50 disabled:opacity-30 transition-all"
+              className="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-500 hover:bg-slate-50 disabled:opacity-30"
             >
-              上一页
+              &lt;
             </button>
             <div className="flex items-center gap-1 mx-1">
-              {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+              {Array.from({ length: Math.min(3, totalPages) }).map((_, i) => {
                 let pageNum = i + 1;
-                if (totalPages > 5 && currentPage > 3) {
-                  pageNum = currentPage - 2 + i;
-                  if (pageNum > totalPages) pageNum = totalPages - (4 - i);
-                  if (pageNum < 1) pageNum = i + 1;
-                }
                 return (
                   <button 
                     key={pageNum} 
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`w-7 h-7 flex items-center justify-center rounded text-[11px] font-bold transition-all ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-100 hover:border-blue-200'}`}
+                    className={`w-6 h-6 flex items-center justify-center rounded text-[10px] font-bold transition-all ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}
                   >
                     {pageNum}
                   </button>
                 );
               })}
+              {totalPages > 3 && <span className="px-1">...</span>}
             </div>
             <button 
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(p => p + 1)}
-              className="px-2.5 py-1 bg-white border border-slate-200 rounded text-slate-600 hover:bg-slate-50 disabled:opacity-30 transition-all"
+              className="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded text-slate-600 hover:bg-slate-50 disabled:opacity-30"
             >
-              下一页
+              &gt;
             </button>
           </div>
         </div>
@@ -605,37 +564,44 @@ const HeaderCell: React.FC<{
 }> = ({ label, onResizeStart, sortable, sortDirection, onSort }) => {
   return (
     <th 
-      className={`p-3 border-r border-b border-slate-200 text-[11px] font-black text-slate-600 relative group text-center transition-all ${sortable ? 'cursor-pointer hover:bg-blue-100/30' : 'hover:bg-slate-50/50'}`}
+      className={`p-2 border-r border-b border-slate-200 text-[10px] font-black text-slate-600 relative group text-center ${sortable ? 'cursor-pointer hover:bg-blue-100/30' : ''}`}
       onClick={sortable ? onSort : undefined}
     >
-      <div className="flex items-center justify-center gap-1.5">
+      <div className="flex items-center justify-center gap-1">
         <span className="truncate">{label}</span>
         {sortable && (
           <div className="flex flex-col shrink-0">
             {sortDirection === 'asc' ? (
-              <ChevronUp size={12} className="text-blue-600" strokeWidth={4} />
+              <ChevronUp size={10} className="text-blue-600" />
             ) : sortDirection === 'desc' ? (
-              <ChevronDown size={12} className="text-blue-600" strokeWidth={4} />
+              <ChevronDown size={10} className="text-blue-600" />
             ) : (
-              <ArrowUpDown size={12} className="text-slate-300" />
+              <ArrowUpDown size={10} className="text-slate-300" />
             )}
           </div>
         )}
       </div>
       <div 
-        className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-400 transition-all z-30" 
+        className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-400 z-30" 
         onMouseDown={(e) => { e.stopPropagation(); onResizeStart(e); }}
       />
     </th>
   );
 };
 
-const SearchItem: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div className="flex flex-col gap-1.5 relative group">
-    <label className="text-[11px] font-bold text-slate-500 pl-0.5 leading-none">{label}</label>
-    <div className="relative">
-      {children}
-    </div>
+const SearchItem: React.FC<{ label: string; children: React.ReactNode, isCompact?: boolean }> = ({ label, children, isCompact }) => (
+  <div className={`flex items-center gap-2 group`}>
+    {!isCompact ? (
+      <div className="flex flex-col gap-1 w-full">
+        <label className="text-[10px] font-bold text-slate-500 pl-0.5 leading-none">{label}</label>
+        {children}
+      </div>
+    ) : (
+      <div className="flex items-center gap-2 w-full">
+        <label className="text-[11px] font-bold text-slate-600 whitespace-nowrap">{label}</label>
+        <div className="flex-1">{children}</div>
+      </div>
+    )}
   </div>
 );
 

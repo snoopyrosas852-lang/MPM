@@ -98,14 +98,14 @@ const App: React.FC = () => {
           {currentView === View.PROJECT_CONFIG && (
             <div className="h-8 px-5 flex items-center gap-4 text-xs font-bold cursor-pointer tab-active animate-in slide-in-from-left-2">
               <span>项目提报配置</span>
-              <X size={12} className="opacity-40 hover:opacity-100" />
+              <X size={12} className="opacity-40 hover:opacity-100" onClick={() => setCurrentView(View.MATERIAL_LIST)} />
             </div>
           )}
           
           {currentView === View.REVIEWER_CONFIG && (
             <div className="h-8 px-5 flex items-center gap-4 text-xs font-bold cursor-pointer tab-active animate-in slide-in-from-left-2">
               <span>商品审核人配置</span>
-              <X size={12} className="opacity-40 hover:opacity-100" />
+              <X size={12} className="opacity-40 hover:opacity-100" onClick={() => setCurrentView(View.MATERIAL_LIST)} />
             </div>
           )}
         </div>
@@ -128,7 +128,7 @@ const App: React.FC = () => {
           {currentView === View.MATERIAL_DETAIL && selectedMaterial && (
             <MaterialDetail material={selectedMaterial} onBack={handleCloseDetail} />
           )}
-          {currentView === View.PROJECT_CONFIG && <ProjectConfig />}
+          {currentView === View.PROJECT_CONFIG && <ProjectConfig onBack={() => setCurrentView(View.MATERIAL_LIST)} />}
           {currentView === View.REVIEWER_CONFIG && <ReviewerConfig />}
         </div>
 

@@ -45,17 +45,40 @@ export interface Material {
 }
 
 export interface ProjectField {
+  id: string; // 序号
+  platformCode: string; // c_platform_code (平台编码)
+  key: string; // c_key (字段 key)
+  name: string; // c_name (字段名)
+  desc: string; // c_desc (字段描述)
+  remark: string; // c_remark (字段备注)
+  required: boolean; // c_required (是否必填)
+  fieldType: string; // c_field_type (字段类型)
+  relationType: string; // c_relation_type (关联类型)
+  ruleId: string; // c_rule_id (规则 id)
+  defaultValue: string; // c_default_value (默认值)
+  controlType: '1' | '2' | '3' | '4'; // c_control_type (前端显示控件类型, 1: 单选框 2: 复选框 3: 下拉框 4: 文本框)
+  pushType: string; // c_push_type (字段属于哪种类型的字段)
+  isProjectField: boolean; // c_project_field (是否是项目型字段)
+  alias: string; // c_alias (字段属于哪种类型的字段)
+  hasRange: boolean; // c_range (是否有范围校验)
+  isContrast: boolean; // c_contrast (推送时是否进行比较)
+  fieldMeaning: '1' | '2' | '3' | ''; // c_field_meaning (字段含义, 1: 品牌 2: 类目 3: 协议价)
+  relateField: string; // c_relate_field (关联字段)
+  relateFieldEnumValue: string; // c_relate_field_enum_value (关联字段枚举值)
+  fieldEnumValue: string; // c_field_enum_value (字段枚举值)
+  submitOperateType: string[]; // c_submit_operate_type (提报操作类型: 1: 新增 2: 修改 3: 重推 4: 上下架 5: 价格更新)
+  sort: number; // c_sort (用于展示、和生成excel的排序)
+  excelType: string; // c_excel_type (生成excel的类型)
+  showSrm: boolean; // c_show_srm (是否在 srm 展示)
+  submissionFieldType: '1' | '2'; // 提报字段类型: 1: 客户推送 2: 提报自建
+}
+
+export interface ProjectInfo {
   id: string;
-  key: string;
   name: string;
+  code: string;
   description: string;
-  type: string;
-  controlType: string;
-  required: boolean;
-  scope: string[];
-  defaultValue: string;
-  relatedField: string;
-  enumValues: string;
+  fieldCount: number;
 }
 
 export interface Manager {
